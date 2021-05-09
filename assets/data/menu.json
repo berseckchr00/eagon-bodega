@@ -1,0 +1,20 @@
+{
+    "nombreApp" : "Componentes",
+    "rutas" : [
+        {
+            "ruta" : "reception",
+            "icon" : "add_alert",
+            "texto": "Recepción"
+        },
+        {
+            "ruta" : "orders",
+            "icon" : "accessibility",
+            "texto": "Pedidos"
+        },
+        {
+            "ruta" : "logout",
+            "icon" : "folder_open",
+            "texto": "Salir"
+        }
+    ]
+}
