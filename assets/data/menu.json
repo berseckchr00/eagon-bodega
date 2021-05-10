@@ -2,6 +2,11 @@
     "nombreApp" : "Componentes",
     "rutas" : [
         {
+            "ruta" : "inicio",
+            "icon" : "home_rounded",
+            "texto": "Inicio"
+        },
+        {
             "ruta" : "reception",
             "icon" : "add_alert",
             "texto": "Recepción"
@@ -13,7 +18,7 @@
         },
         {
             "ruta" : "logout",
-            "icon" : "folder_open",
+            "icon" : "exit_to_app",
             "texto": "Salir"
         }
     ]
