@@ -1,3 +1,4 @@
+import 'package:eagon_bodega/src/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:eagon_bodega/src/providers/menu_provider.dart';
@@ -16,15 +17,16 @@ class NavDrawer extends StatelessWidget{
 
     return FutureBuilder(
       future: menuProvider.loadMenu(),
+      initialData: [],
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot){
         return ListView(
-          children: _createItems(snapshot.data),
+          children: _createItems(snapshot.data, context),
         );
       },
     );
   }
 
-  List<Widget> _createItems(List<dynamic> data) {
+  List<Widget> _createItems(List<dynamic> data, BuildContext context) {
     
     final List<Widget> opciones = [];
     
@@ -45,6 +47,9 @@ class NavDrawer extends StatelessWidget{
     opciones
     ..add(drawerHead)
     ..add(Divider());
+    
+    
+
     data.forEach((opt) {
 
         final widgetTemp = ListTile(
@@ -52,12 +57,21 @@ class NavDrawer extends StatelessWidget{
           leading: getIconByString(opt['icon']),
           onTap: (){
 
+            /*final route = MaterialPageRoute(
+              builder: (context) => HomePage()
+            );*/
+
+            //Navigator.push(context, route);
+            Navigator.pushNamed(context, opt['ruta']);
           },
         );
 
-        opciones
-        ..add(widgetTemp)
-        ..add(Divider());
+        opciones.add(widgetTemp);
+
+        if(opt['divider']){
+          opciones.add(Divider());
+        }
+        
         
     });
 

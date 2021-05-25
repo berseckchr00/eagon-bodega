@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-//import 'package:componentes/src/pages/listViewStatic.dart';
-//import 'package:componentes/src/pages/listViewDynamic.dart';
 import 'package:eagon_bodega/src/pages/home_page.dart';
+import 'package:eagon_bodega/src/routes/routes.dart';
+import 'package:flutter/material.dart';
  
 void main() => runApp(MyApp());
  
@@ -11,7 +10,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Bodega Eagon',
       debugShowCheckedModeBanner: false,
-      home: HomePage()
+      //home: LoginPage(),
+      initialRoute: '/login',
+      routes: getApplicationRoutes(),
+      onGenerateRoute: (RouteSettings settings){
+        return MaterialPageRoute(
+          builder: ( BuildContext context ) => HomePage()
+        );
+      },
     );
   }
 }

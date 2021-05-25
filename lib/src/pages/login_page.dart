@@ -1,3 +1,5 @@
+import 'package:eagon_bodega/src/models/user_model.dart';
+import 'package:eagon_bodega/src/providers/users_provider.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget{
@@ -12,6 +14,9 @@ class _LoginPageState extends State<LoginPage>{
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {'user': null, 'password': null};
 
+  UserModel user = new UserModel();
+  UserProvider userProvider = new UserProvider();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,11 +26,11 @@ class _LoginPageState extends State<LoginPage>{
         centerTitle: true,
         backgroundColor: Colors.orange,
       ),
-      body: _createForm()
+      body: _createForm(context)
     );
   }
 
-Widget _createForm(){
+Widget _createForm(BuildContext context){
   return Form(
     key: _formKey,
     child :
@@ -59,7 +64,7 @@ Widget _createForm(){
           Padding(
               padding: const EdgeInsets.only(
                 left: 15.0, right: 15.0, top: 15, bottom: 0),
-              child:_createSubmitButton()
+              child:_createSubmitButton(context)
           )
         ]
       )
@@ -69,7 +74,8 @@ Widget _createForm(){
 
   Widget _createUserInput(){
     return TextFormField(
-      style: TextStyle(color: Colors.white, fontSize: 20.0),
+      initialValue: user.idUser,
+      style: TextStyle(color: Colors.black, fontSize: 20.0),
       decoration: const InputDecoration(
         hintText: 'Ingresa tu usuario',
         contentPadding: EdgeInsets.all(20.0),
@@ -83,13 +89,15 @@ Widget _createForm(){
       },
       onSaved: (String value) {
         _formData['user'] = value;
+        user.idUser = value;
       },
     );
   }
 
   Widget _createPasswordInput(){
     return TextFormField(
-      style: TextStyle(color: Colors.white, fontSize: 20.0),
+      initialValue: user.passWord,
+      style: TextStyle(color: Colors.black, fontSize: 20.0),
       decoration: const InputDecoration(
         hintText: 'Ingresa tu clave',
         contentPadding: EdgeInsets.all(20.0),
@@ -103,19 +111,20 @@ Widget _createForm(){
       },
       onSaved: (String value) {
         _formData['password'] = value;
+        user.passWord = value;
       },
       obscureText: true
     );
   }
 
-  Widget _createSubmitButton(){
+  Widget _createSubmitButton(BuildContext context){
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         primary: Colors.orange
       ),
       onPressed: (){
           if (_formKey.currentState.validate()){
-            _submitForm();
+            _submitForm(context);
           }
         }, 
       child: Text('Ingresar',
@@ -124,10 +133,20 @@ Widget _createForm(){
       );
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print(_formData);
+
+      final Future<UserModel> generatedUser = userProvider.getUserLogin(user);
+
+      generatedUser.then((value) => {
+        if (value.status == 1) {
+          Navigator.pushNamed(context, '/home')
+        }
+      });
+      //Navigator.pushNamed(context, '/home');
+
     }
   }
 }
