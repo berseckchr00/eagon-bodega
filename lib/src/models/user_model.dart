@@ -24,7 +24,7 @@ class UserModel {
     String passWord;
     int status;
     String msgStatus;
-    String idUser;
+    dynamic idUser;
     String idPersonal;
     String numFicha;
     String origenType;

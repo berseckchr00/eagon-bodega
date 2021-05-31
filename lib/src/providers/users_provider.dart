@@ -11,7 +11,7 @@ class UserProvider{
 
   Future<UserModel> getUserLogin(UserModel user) async{
     
-    String userName = user.idUser;
+    dynamic userName = user.idUser;
     String passWord = user.passWord;
 
     var uri = Uri.parse('$_url/login_api?user=$userName&pass=$passWord');

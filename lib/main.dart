@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
       title: 'Bodega Eagon',
       debugShowCheckedModeBanner: false,
       //home: LoginPage(),
-      initialRoute: '/login',
+      initialRoute: '/home',
       routes: getApplicationRoutes(),
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
