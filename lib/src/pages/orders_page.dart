@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:eagon_bodega/src/pages/navdrawer_page.dart';
-
 class OrdersPage extends StatefulWidget{
   
   @override
@@ -16,7 +14,7 @@ class _OrdersPageState extends State<OrdersPage>{
 
   List<Step> steps = [
     Step(
-      title: const Text('Detalle documento'),
+      title: const Text('Datos generales'),
       isActive: true,
       state: StepState.complete,
       content: Column(
@@ -66,7 +64,7 @@ class _OrdersPageState extends State<OrdersPage>{
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: AppBar(
-        title: Text('Steps'),
+        title: Text('Recepción'),
       ),
       body: Column(
         children: <Widget>[

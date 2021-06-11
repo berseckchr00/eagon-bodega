@@ -18,16 +18,20 @@ class UserModel {
         this.idPersonal,
         this.numFicha,
         this.origenType,
+        this.ci_session,
     });
 
+    dynamic user;
+    dynamic pass;
     String userName;
     String passWord;
     int status;
     String msgStatus;
     dynamic idUser;
-    String idPersonal;
+    dynamic idPersonal;
     String numFicha;
     String origenType;
+    String ci_session;
 
     factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         userName      : json["userName"],
@@ -38,6 +42,7 @@ class UserModel {
         idPersonal    : json["id_personal"],
         numFicha      : json["num_ficha"],
         origenType    : json["origen_type"],
+        ci_session    : json["ci_session"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -49,5 +54,6 @@ class UserModel {
         "id_personal"   : idPersonal,
         "num_ficha"     : numFicha,
         "origen_type"   : origenType,
+        "ci_session"    : ci_session
     };
 }

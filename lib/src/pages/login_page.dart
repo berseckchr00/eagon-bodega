@@ -90,6 +90,7 @@ Widget _createForm(BuildContext context){
       onSaved: (String value) {
         _formData['user'] = value;
         user.idUser = value;
+        user.user = value;
       },
     );
   }
@@ -112,6 +113,7 @@ Widget _createForm(BuildContext context){
       onSaved: (String value) {
         _formData['password'] = value;
         user.passWord = value;
+        user.pass = value;
       },
       obscureText: true
     );
@@ -136,13 +138,14 @@ Widget _createForm(BuildContext context){
   void _submitForm(BuildContext context) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      print(_formData);
 
       final Future<UserModel> generatedUser = userProvider.getUserLogin(user);
 
       generatedUser.then((value) => {
-        if (value.status == 1) {
-          Navigator.pushNamed(context, '/home')
+        if (value != null){
+          if (value.status == 1) {
+            Navigator.pushNamed(context, '/home')
+          }
         }
       });
       //Navigator.pushNamed(context, '/home');

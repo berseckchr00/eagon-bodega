@@ -1,3 +1,4 @@
+//import 'package:eagon_bodega/src/pages/alert_dialog_page.dart';
 import 'package:eagon_bodega/src/pages/home_page.dart';
 import 'package:eagon_bodega/src/pages/login_page.dart';
 import 'package:eagon_bodega/src/pages/orders_page.dart';
@@ -12,6 +13,7 @@ Map <String,WidgetBuilder> getApplicationRoutes(){
     '/home' : (BuildContext context) => HomePage(),
     '/orders' : (BuildContext context) => OrdersPage(),
     '/reception' : (BuildContext context) => OrdersPage(),
+    //'/alert' : (BuildContext context) => StatefulDialog(),
     //'/login' : (BuildContext context) => LoginPage(),
   };
 }
