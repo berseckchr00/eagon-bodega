@@ -30,6 +30,16 @@ class _HomePageState extends State<HomePage> {
   }*/
 
   @override
+  void didUpdateWidget (Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+          _loadPendantReceptions(context).then((value) => 
+            _cardReception = value
+          );
+    }); 
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: NavDrawer(),
@@ -381,11 +391,16 @@ class _HomePageState extends State<HomePage> {
                   primary: Colors.orange
                 ),
                 onPressed: (){
-                  if (_formKey.currentState.validate()) {
+                    _loadPendantReceptions(context).then((value) => 
+                      this.setState((){
+                          _cardReception = value;
+                      })
+                    );
+                  /*if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
                     //ReceptionProvider().getDteDetail(_formData['rut'], _formData['folio']);
                     _loadPendantReceptions(context);
-                  }
+                  }*/
                 }, 
                 child: Text("Buscar")
               )
@@ -395,7 +410,7 @@ class _HomePageState extends State<HomePage> {
       });
   }
 
-  Future<void> _showDeliveryDialog(BuildContext context) async{
+  void _showDeliveryDialog(BuildContext context) async{
     return await showDialog(
       context: context, 
       builder: (context){
@@ -422,13 +437,13 @@ class _HomePageState extends State<HomePage> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.orange
                 ),
-                onPressed: () async{
+                onPressed: (){
                   //_showOrderDialog(context);
-                  await _loadPendantReceptions(context).then((value) => 
-                    setState((){
-                      _cardReception = value;
-                    })
-                  );
+                    this.setState((){
+                    _loadPendantReceptions(context).then((value) => 
+                        _cardReception = value
+                    );
+                  });
                 }, 
                 child: Text("Buscar")
               )

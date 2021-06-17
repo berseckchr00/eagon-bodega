@@ -11,7 +11,7 @@ class ReceptionProvider{
   
   final String _url = EnviromentConfig().getApiUrl();
   final prefs  = new PreferenciasUsuario();
-  final _limit = 5;
+  final _limit = 1;
   final _start = 1;
 
   Future<DteModel> getDteList() async{
