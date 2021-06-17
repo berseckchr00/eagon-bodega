@@ -1,6 +1,7 @@
 import 'package:eagon_bodega/src/models/user_model.dart';
 import 'package:eagon_bodega/src/providers/users_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget{
   
@@ -145,6 +146,16 @@ Widget _createForm(BuildContext context){
         if (value != null){
           if (value.status == 1) {
             Navigator.pushNamed(context, '/home')
+          }else{
+            Fluttertoast.showToast(
+              msg: "Error al iniciar",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+            )
           }
         }
       });

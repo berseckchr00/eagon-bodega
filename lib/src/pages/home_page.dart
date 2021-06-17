@@ -1,10 +1,33 @@
+import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/pages/navdrawer_page.dart';
+import 'package:eagon_bodega/src/providers/reception_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
 
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final Map<String, String> _formData = {'rut': null, 'folio': null};
   final _formKey = GlobalKey<FormState>();
+  var folioDte = 0;
+  var rutDte = "";
+
+  List<Widget> _cardReception;
+
+  /*@override
+  void initState() { 
+    super.initState();
+    setState(() {
+          _loadPendantReceptions(context).then((value) => 
+            _cardReception = value
+          );
+    }); 
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +72,7 @@ class HomePage extends StatelessWidget {
         ) 
       );
   }
-  
+
   Widget _createHorizontalView(context){
   return Container(
     margin: EdgeInsets.symmetric(vertical: 5.0),
@@ -94,36 +117,7 @@ class HomePage extends StatelessWidget {
                   child:
                     ListView(
                     scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      Container(
-                        width: 300.0,
-                        //color: Colors.red,
-                        child: _pendingReception(context),
-                        //padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        margin: EdgeInsets.only(left:10),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.blue,
-                        child: _pendingReception(context),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.green,
-                        child: _pendingReception(context),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.yellow,
-                        child: _pendingReception(context),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.orange,
-                        child: _pendingReception(context),
-                        
-                      ),
-                    ],
+                    children: (_cardReception != null)?_cardReception:[]
                   ),
                 ),
                 Divider(
@@ -303,7 +297,10 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _pendingReception(BuildContext context) {
+  Widget _pendingReception(BuildContext context, Item item) {
+ 
+    var fchEmis = DateFormat.yMd().format(item.fchEmis);
+
     return Card(
       
       color: Colors.amber.shade100,
@@ -319,8 +316,8 @@ class HomePage extends StatelessWidget {
             ),
           ListTile(
             leading: Icon(Icons.online_prediction_sharp, color: Colors.amberAccent.shade700),
-            title: Text('Recepcion N° 123432'),
-            subtitle: Text('Proveedor : EAGON LAUTARO \nFecha Emisión : 01-01-2021'),
+            title: Text('Recepcion N° ${item.dteFolio}'),
+            subtitle: Text('Proveedor :${item.rznSoc} \nFecha Emisión :$fchEmis'),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -359,12 +356,20 @@ class HomePage extends StatelessWidget {
                       return value.isNotEmpty? null: "Número Inválido";
                     },
                     decoration: InputDecoration(hintText: "ex : 123456789"),
+                    onSaved: (String value){
+                      _formData['folio'] = value;
+                      this.folioDte = int.parse(value);
+                    },
                   ),
                   TextFormField(
                     validator: (value){
                       return value.isNotEmpty? null: "Rut Inválido";
                     },
                     decoration: InputDecoration(hintText: "ex : 77407770-7"),
+                    onSaved: (String value){
+                      _formData['rut'] = value;
+                      this.rutDte = value;
+                    },
                   ),
                 ],
               ),
@@ -376,7 +381,11 @@ class HomePage extends StatelessWidget {
                   primary: Colors.orange
                 ),
                 onPressed: (){
-                  //_showOrderDialog(context);
+                  if (_formKey.currentState.validate()) {
+                    _formKey.currentState.save();
+                    //ReceptionProvider().getDteDetail(_formData['rut'], _formData['folio']);
+                    _loadPendantReceptions(context);
+                  }
                 }, 
                 child: Text("Buscar")
               )
@@ -386,7 +395,6 @@ class HomePage extends StatelessWidget {
       });
   }
 
-  
   Future<void> _showDeliveryDialog(BuildContext context) async{
     return await showDialog(
       context: context, 
@@ -414,8 +422,13 @@ class HomePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.orange
                 ),
-                onPressed: (){
+                onPressed: () async{
                   //_showOrderDialog(context);
+                  await _loadPendantReceptions(context).then((value) => 
+                    setState((){
+                      _cardReception = value;
+                    })
+                  );
                 }, 
                 child: Text("Buscar")
               )
@@ -423,5 +436,36 @@ class HomePage extends StatelessWidget {
           );
         });
       });
+  }
+
+  Future<List<Widget>> _loadPendantReceptions(BuildContext context) async{
+    ReceptionProvider reception = new ReceptionProvider();
+    DteModel _dte = await reception.getDteList();   
+    List<Widget> _boxes;
+
+    if (_dte != null && _dte.data.items != null){
+      _boxes = _setBoxes(_dte.data.items);    
+    }   
+
+   return _boxes;
+  }
+
+  List<Widget> _setBoxes(List<Item> items){
+    List<Widget> boxes = [];
+    items.forEach((element) {
+      final content = 
+      Container(
+        width: 360.0,
+        //color: Colors.red,
+        child: _pendingReception(context, element),
+        //padding: EdgeInsets.symmetric(horizontal: 10.0),
+        margin: EdgeInsets.only(left:10),
+      );
+      
+      boxes.add(content);
+      
+    });
+
+    return boxes;
   }
 }

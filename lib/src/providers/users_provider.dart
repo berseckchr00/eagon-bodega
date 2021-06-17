@@ -1,46 +1,43 @@
 
 import 'dart:convert';
-
-import 'package:eagon_bodega/src/shared_preferences/preferencias_usuario.dart';
 import 'package:http/http.dart' as http;
 import 'package:eagon_bodega/src/models/user_model.dart';
+import 'package:eagon_bodega/src/config/enviroment_config.dart';
+import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
 
 class UserProvider{
 
-  final String _url = 'http://200.54.216.196/infoela.cl/api_bodega/v1';
-  //final _prefs = new PreferenciasUsuario();
+
+  final String _url = EnviromentConfig().getApiUrl();
+  final prefs = new PreferenciasUsuario();
 
   Future<UserModel> getUserLogin(UserModel user) async{
     //var url = '$_url/login.php/login';
     var uri = Uri.parse('$_url/login.php/login');
     Map<String, String> headers = {
       "content-type": "application/x-www-form-urlencoded",
-      'Authorization': '767ad943570d6dce845ca37f7dee92f5'
+      'Authorization': EnviromentConfig().getApiKey()
     };
     Map<String, String> queryParameters = {
       "user": user.user,
       "pass": user.pass
     };
 
-    //String payloadAsString = "{\"foo\":\"bar\"}";
-
     var data;
+
     try{
-      
+ 
+
       final resp = await http.post( uri, body: queryParameters,  headers: headers);
 
       data = Utf8Codec().decode(resp.bodyBytes);
       
-      print(data);
-      if (data == null) return null;
+      if (data == null || data == "") return null;
 
       final userData = UserModel.fromJson(jsonDecode(data));
+      prefs.ciSession = userData.ci_session;
 
-      print(data);
-      print(userData);
-      
-      //_prefs.ciSession = userData.ci_session;
-
+      print(prefs.ciSession);
       return userData;
     }catch(e){
       print(e);

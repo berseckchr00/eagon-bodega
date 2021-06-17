@@ -63,6 +63,7 @@ class NavDrawer extends StatelessWidget{
 
             //Navigator.push(context, route);
             Navigator.pushNamed(context, opt['ruta']);
+            //Navigator.pushReplacementNamed(context, opt['ruta']);
           },
         );
 
