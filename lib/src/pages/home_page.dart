@@ -1,3 +1,4 @@
+
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/pages/navdrawer_page.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
@@ -19,24 +20,24 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> _cardReception;
 
-  /*@override
+  @override
   void initState() { 
     super.initState();
-    setState(() {
-          _loadPendantReceptions(context).then((value) => 
-            _cardReception = value
-          );
-    }); 
-  }*/
+    _loadPendantReceptions().then((value) => 
+      setState(() {
+          _cardReception = value;
+      }) 
+    );
+  }
 
   @override
   void didUpdateWidget (Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    setState(() {
-          _loadPendantReceptions(context).then((value) => 
-            _cardReception = value
-          );
-    }); 
+    _loadPendantReceptions().then((value) => 
+      setState(() {
+            _cardReception = value;
+      })
+    );
   }
 
   @override
@@ -338,7 +339,7 @@ class _HomePageState extends State<HomePage> {
               ),
               TextButton(
                 onPressed: (){
-                  Navigator.pushNamed(context, '/reception');
+                  Navigator.pushNamed(context, '/reception', arguments: item);
                 }, 
                 child: Text('Recepcionar')
               )
@@ -391,16 +392,16 @@ class _HomePageState extends State<HomePage> {
                   primary: Colors.orange
                 ),
                 onPressed: (){
-                    _loadPendantReceptions(context).then((value) => 
+                   
+                  if (_formKey.currentState.validate()) {
+                    _formKey.currentState.save();
+                    //ReceptionProvider().getDteDetail(_formData['rut'], _formData['folio']);
+                    _searchPendantReceptions(_formData['rut'], _formData['folio']).then((value) => 
                       this.setState((){
                           _cardReception = value;
                       })
                     );
-                  /*if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    //ReceptionProvider().getDteDetail(_formData['rut'], _formData['folio']);
-                    _loadPendantReceptions(context);
-                  }*/
+                  }
                 }, 
                 child: Text("Buscar")
               )
@@ -427,6 +428,7 @@ class _HomePageState extends State<HomePage> {
                       return value.isNotEmpty? null: "Número Inválido";
                     },
                     decoration: InputDecoration(hintText: "ex : 123456789"),
+                    
                   )
                 ],
               ),
@@ -439,11 +441,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: (){
                   //_showOrderDialog(context);
-                    this.setState((){
-                    _loadPendantReceptions(context).then((value) => 
-                        _cardReception = value
-                    );
-                  });
+                  if (_formKey.currentState.validate()){
+                    _formKey.currentState.save();
+                  }                    
                 }, 
                 child: Text("Buscar")
               )
@@ -453,7 +453,7 @@ class _HomePageState extends State<HomePage> {
       });
   }
 
-  Future<List<Widget>> _loadPendantReceptions(BuildContext context) async{
+  Future<List<Widget>> _loadPendantReceptions() async{
     ReceptionProvider reception = new ReceptionProvider();
     DteModel _dte = await reception.getDteList();   
     List<Widget> _boxes;
@@ -461,6 +461,29 @@ class _HomePageState extends State<HomePage> {
     if (_dte != null && _dte.data.items != null){
       _boxes = _setBoxes(_dte.data.items);    
     }   
+
+   return _boxes;
+  }
+
+  Future<List<Widget>> _searchPendantReceptions(String rut, String folio) async{
+    ReceptionProvider reception = new ReceptionProvider();
+    DteModel _dte = await reception.getDteDetail(rut, folio);   
+    List<Widget> _boxes;
+    List<Item> items = [];
+
+    if (_dte != null && _dte.data.items != null){
+      Head head = _dte.data.head;
+      _dte.data.items.forEach((element) {
+        print(element.toJson().toString());
+        Item item = Item.fromJson(element.toJson());
+        item.fchEmis  = head.fchEmis;
+        item.rznSoc   = head.rznSoc;  
+        item.dteFolio = head.dteFolio;
+        items.add(item);
+      });
+
+      _boxes = _setBoxes(items);       
+    }
 
    return _boxes;
   }

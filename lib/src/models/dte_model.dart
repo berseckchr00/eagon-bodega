@@ -130,7 +130,7 @@ class Item {
         dteFolio: json["dte_folio"] == null ? null:json["dte_folio"],
         rutEmisor: json["RUTEmisor"] == null ? null:json["RUTEmisor"],
         rznSoc: json["RznSoc"] == null ? null:json["RznSoc"],
-        fchEmis: json["FchEmis"] == null ? null:DateTime.parse(json["FchEmis"]),
+        fchEmis: json["FchEmis"] == null ? DateTime.parse('2020-01-01'):DateTime.parse(json["FchEmis"]),
         idDteDetail: json["ID_DTE_DETAIL"] == null ? null : json["ID_DTE_DETAIL"],
         idDteHeader: json["ID_DTE_HEADER"] == null ? null : json["ID_DTE_HEADER"],
         nroLinDet: json["NroLinDet"] == null ? null : json["NroLinDet"],
@@ -142,8 +142,8 @@ class Item {
         unmdItem: json["UnmdItem"] == null ? null : json["UnmdItem"],
         prcItem: json["PrcItem"] == null ? null : json["PrcItem"],
         montoItem: json["MontoItem"] == null ? null : json["MontoItem"],
-        dateCreate: json["Date_Create"] == null ? null : DateTime.parse(json["Date_Create"]),
-        dateUpdate: json["Date_Update"] == null ? null : DateTime.parse(json["Date_Update"]),
+        dateCreate: json["Date_Create"] == null ? DateTime.parse('2020-01-01') : DateTime.parse(json["Date_Create"]),
+        dateUpdate: json["Date_Update"] == null ? DateTime.parse('2020-01-01') : DateTime.parse(json["Date_Update"]),
     );
 
     Map<String, dynamic> toJson() => {
