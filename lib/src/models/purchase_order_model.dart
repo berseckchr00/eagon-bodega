@@ -1,21 +1,21 @@
 // To parse this JSON data, do
 //
-//     final purchaseOrder = purchaseOrderFromJson(jsonString);
+//     final PurchaseOrderModel = purchaseOrderFromJson(jsonString);
 
 import 'dart:convert';
 
-PurchaseOrder purchaseOrderFromJson(String str) => PurchaseOrder.fromJson(json.decode(str));
+PurchaseOrderModel purchaseOrderFromJson(String str) => PurchaseOrderModel.fromJson(json.decode(str));
 
-String purchaseOrderToJson(PurchaseOrder data) => json.encode(data.toJson());
+String purchaseOrderToJson(PurchaseOrderModel data) => json.encode(data.toJson());
 
-class PurchaseOrder {
-    PurchaseOrder({
+class PurchaseOrderModel {
+    PurchaseOrderModel({
         this.data,
     });
 
     Data data;
 
-    factory PurchaseOrder.fromJson(Map<String, dynamic> json) => PurchaseOrder(
+    factory PurchaseOrderModel.fromJson(Map<String, dynamic> json) => PurchaseOrderModel(
         data: Data.fromJson(json["data"]),
     );
 

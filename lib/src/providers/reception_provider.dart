@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 import 'package:eagon_bodega/src/models/dte_model.dart';
-import 'package:eagon_bodega/src/models/purchase_order.dart';
+import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:eagon_bodega/src/config/enviroment_config.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
@@ -61,7 +61,7 @@ class ReceptionProvider{
     }
   }
 
-  Future<PurchaseOrder> getOc(String nmro_oc) async{
+  Future<PurchaseOrderModel> getOc(String nmro_oc) async{
     
     var uri = Uri.parse('$_url/reception.php/getDocumentOcList/$nmro_oc');
     Map<String, String> headers = {
@@ -75,7 +75,8 @@ class ReceptionProvider{
       
       final resp = await http.get(uri, headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
-      final oc = PurchaseOrder.fromJson(jsonDecode(data));
+      print(data);
+      final oc = PurchaseOrderModel.fromJson(jsonDecode(data));
       return oc;
       //List<Dte> lstDte = new 
 
