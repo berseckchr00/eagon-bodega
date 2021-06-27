@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:eagon_bodega/src/models/user_model.dart';
+import 'package:eagon_bodega/src/utils/string_utils.dart';
 import 'package:eagon_bodega/src/config/enviroment_config.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
 
@@ -32,14 +33,15 @@ class UserProvider{
 
       data = Utf8Codec().decode(resp.bodyBytes);
       
-      if (data == null || data == "") return null;
+      if (!isJson(data)) return null;
 
-      final userData = UserModel.fromJson(jsonDecode(data));
+      final validJson = jsonDecode(data);
+      final userData = UserModel.fromJson(validJson);
       prefs.ciSession = userData.ci_session;
 
       print(prefs.ciSession);
       return userData;
-    }catch(e){
+    } on FormatException catch (e) {
       print(e);
       return null;
     }

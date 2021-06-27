@@ -1,10 +1,12 @@
-import 'package:eagon_bodega/src/pages/home_page.dart';
+import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
 import 'package:flutter/material.dart';
 
 import 'package:eagon_bodega/src/providers/menu_provider.dart';
 import 'package:eagon_bodega/src/utils/icons_string_utils.dart';
 
 class NavDrawer extends StatelessWidget{
+
+  final prefs = new PreferenciasUsuario();
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,13 @@ class NavDrawer extends StatelessWidget{
             );*/
 
             //Navigator.push(context, route);
-            Navigator.pushNamed(context, opt['ruta']);
+            if(opt['ruta'] == '/logout') {
+              prefs.ciSession = '';
+              Navigator.of(context).pushNamedAndRemoveUntil(opt['ruta'] , (Route<dynamic> route) => false);
+            }
+            else{
+              Navigator.pushNamed(context, opt['ruta']);
+            }
             //Navigator.pushReplacementNamed(context, opt['ruta']);
           },
         );

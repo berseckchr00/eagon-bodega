@@ -20,7 +20,7 @@
             "divider": true
         },
         {
-            "ruta" : "/login",
+            "ruta" : "/logout",
             "icon" : "exit_to_app",
             "texto": "Salir",
             "divider": false

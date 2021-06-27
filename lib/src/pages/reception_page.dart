@@ -218,9 +218,6 @@ class _OrdersPageState extends State<ReceptionPage>{
     DropdownButton dp;
 
     items.forEach((element) {
-      String item = element.vlrCodigo + ' - '
-              +element.nmbItem;
-
       if (oc != null){
         // acá agregamos el select para la oc
         //String _value = oc.data.details[0].codigoProducto;
@@ -260,58 +257,43 @@ class _OrdersPageState extends State<ReceptionPage>{
               },
           );          
       }
-
-      Row row = new Row(
-            children: [
-              Expanded(
-                child: 
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Item', ),
-                  readOnly: true,
-                  initialValue: element.nmbItem,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  style: TextStyle(
-                    fontSize: 12
-                  ),
-                )
-              ),
-              Expanded(child: 
-                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Cantidad'),
-                  readOnly: false,
-                  initialValue: element.qtyItem,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  style: TextStyle(
-                    fontSize: 12
-                  ),
-                )
-              ),
-              Expanded(
-                child: 
-                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Un. Medida'),
-                  readOnly: true,
-                  initialValue: element.unmdItem,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  style: TextStyle(
-                    fontSize: 12
-                  ),
-                )
-              )
-            ],
-          );
-
-      _det.add(row);
-      _det.add(dp);
+      _det.add(_createDetailCard(element, oc));
     });
 
     return _det;
   }
 
-
+  Widget _createDetailCard(Item it, order.PurchaseOrderModel oc){
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            leading: Text(it.nroLinDet),
+            title: Text(it.nmbItem),
+            subtitle: Row(
+              children:[
+                Expanded(
+                child: 
+                TextFormField(
+                    decoration: InputDecoration(labelText: 'Cantidad', ),
+                    readOnly: true,
+                    initialValue: it.qtyItem,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    style: TextStyle(
+                      fontSize: 12
+                    ),
+                  )
+                ),
+                Text(it.unmdItem),
+              ]      
+            )        
+          ),
+        ],
+      )
+      
+    );
+  }
 
   Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async{
     ReceptionProvider reception = new ReceptionProvider();

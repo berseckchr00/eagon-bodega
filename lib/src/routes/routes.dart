@@ -10,10 +10,11 @@ Map <String,WidgetBuilder> getApplicationRoutes(){
 
 
   return <String,WidgetBuilder>{
-    '/login' : (BuildContext context) => LoginPage(),
+    '/login' : (context) => LoginPage(),
     '/home' : (BuildContext context) => HomePage(),
     '/orders' : (BuildContext context) => OrdersPage(),
     '/reception' : (BuildContext context) => ReceptionPage(),
+    '/logout' : (BuildContext context) => LoginPage(),
     //'/alert' : (BuildContext context) => StatefulDialog(),
     //'/login' : (BuildContext context) => LoginPage(),
   };

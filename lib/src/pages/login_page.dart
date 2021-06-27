@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage>{
         title: Text('EAGON Bodega'),
         centerTitle: true,
         backgroundColor: Colors.orange,
+        automaticallyImplyLeading: false,
       ),
       body: _createForm(context)
     );
@@ -157,6 +158,16 @@ Widget _createForm(BuildContext context){
               fontSize: 16.0
             )
           }
+        }else{
+          Fluttertoast.showToast(
+              msg: "Error al iniciar",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+            )
         }
       });
       //Navigator.pushNamed(context, '/home');
