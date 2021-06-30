@@ -18,6 +18,7 @@ class _OrdersPageState extends State<ReceptionPage>{
   int currentStep = 0;
   bool complete = false;
   Item item;
+  order.Detail selectedDetail ;
 
   List<Step> steps;
   Stepper stepper;
@@ -214,81 +215,94 @@ class _OrdersPageState extends State<ReceptionPage>{
 
   List<Widget> _createDetail(BuildContext conext, List<Item> items, order.PurchaseOrderModel oc){
     List<Widget> _det = [];
-    List<order.Detail> _detOc = (oc != null)?oc.data.details:null;
-    DropdownButton dp;
+    List<order.Detail> _detOc = (oc != null)?oc.data.details:[];
+    List<String> _lstDetailOc = [];
 
     items.forEach((element) {
-      if (oc != null){
-        // acá agregamos el select para la oc
-        //String _value = oc.data.details[0].codigoProducto;
-        int _value = 1;
-        List<String> _lstDetailOc = [];
+      if (_detOc.isNotEmpty){
         _detOc.forEach((element) {
           _lstDetailOc.add(element.codigoProducto);
-        });
-
-        dp = new DropdownButton<String>(
-            //value: _value,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded),
-            iconSize: 24,
-            elevation: 16,
-            style: const TextStyle(color: Colors.black),
-            underline: Container(
-              height: 2,
-              color: Colors.grey,
-            ),
-            items: _lstDetailOc
-            .map((String value) {
-              return DropdownMenuItem(
-                value: value,
-                child: Text(value)
-              );
-            }).toList(),
-            onChanged: (selectedValue) {
-                print(selectedValue);
-                setState(() {
-                  for (int i = 0; i < _lstDetailOc.length; i++)
-                    if (_lstDetailOc[i] == selectedValue) {
-                      _value = i + 1;
-                    }
-                  //hintValue = "Steuerklasse $selectedValue";
-                  return _value;
-                });
-              },
-          );          
+        }); 
       }
-      _det.add(_createDetailCard(element, oc));
+      _det.add(_createDetailCard(element, _detOc));
     });
 
     return _det;
   }
 
-  Widget _createDetailCard(Item it, order.PurchaseOrderModel oc){
+  Color _getColorCard(bool status){
+    return (!status)?Colors.orange.shade200:Colors.greenAccent.shade200;
+  }
+
+  Widget _createDetailCard(Item it, List<order.Detail> lstDetailOc){
     return Card(
+      color: _getColorCard(false),
       child: Column(
         children: [
           ListTile(
-            leading: Text(it.nroLinDet),
+            leading: Text(
+              it.nroLinDet,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold
+              ),
+            ),
             title: Text(it.nmbItem),
             subtitle: Row(
               children:[
                 Expanded(
                 child: 
                 TextFormField(
-                    decoration: InputDecoration(labelText: 'Cantidad', ),
-                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Cantidad',
+                       hintStyle: TextStyle(
+                         color: Colors.orange.shade300
+                       ),
+                       labelStyle: TextStyle(
+                         color: Colors.orange.shade900
+                       ), 
+                    ),
+                    readOnly: false,
                     initialValue: it.qtyItem,
-                    keyboardType: TextInputType.multiline,
+                    keyboardType: TextInputType.number,
                     maxLines: null,
                     style: TextStyle(
-                      fontSize: 12
+                      fontSize: 18
                     ),
                   )
                 ),
-                Text(it.unmdItem),
+                Text(it.unmdItem,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal
+                    )
+                ),
               ]      
             )        
           ),
+          new DropdownButton<order.Detail>(
+                hint: new Text(
+                    (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin OC", 
+                    style:  new TextStyle(color: Colors.black)),
+                value: selectedDetail,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                iconSize: 24,
+                onChanged: (order.Detail newValue) {
+                    setState(() {
+                        selectedDetail = newValue ;
+                        _getColorCard(true);
+                        print(selectedDetail.codigoProducto);
+                    });
+                  },
+                items: lstDetailOc.map((order.Detail value) {
+                  return new DropdownMenuItem(
+                    value: value,
+                    child: Text(
+                      value.codigoProducto,
+                      style: new TextStyle(color: Colors.black))
+                  );
+                }).toList()
+              )
         ],
       )
       

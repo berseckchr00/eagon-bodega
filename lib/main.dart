@@ -1,4 +1,3 @@
-import 'package:eagon_bodega/src/pages/home_page.dart';
 import 'package:eagon_bodega/src/pages/login_page.dart';
 import 'package:eagon_bodega/src/routes/routes.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';

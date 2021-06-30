@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:eagon_bodega/src/models/user_model.dart';
 import 'package:eagon_bodega/src/providers/users_provider.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +12,27 @@ class LoginPage extends StatefulWidget{
 
 }
 
-class _LoginPageState extends State<LoginPage>{
+class _LoginPageState extends State<LoginPage>
+  with TickerProviderStateMixin{
 
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {'user': null, 'password': null};
 
   UserModel user = new UserModel();
   UserProvider userProvider = new UserProvider();
+
+  bool submitting = false;
+
+  @override
+  void initState() { 
+    super.initState();
+  }
+
+  void _toggleSubmitState() {
+    setState(() {
+      submitting = !submitting;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +44,13 @@ class _LoginPageState extends State<LoginPage>{
         backgroundColor: Colors.orange,
         automaticallyImplyLeading: false,
       ),
-      body: _createForm(context)
+      body:  !submitting
+            ? _createForm(context)
+            : const Center(child: const CircularProgressIndicator())
     );
   }
 
-Widget _createForm(BuildContext context){
+  Widget _createForm(BuildContext context){
   return Form(
     key: _formKey,
     child :
@@ -140,14 +158,24 @@ Widget _createForm(BuildContext context){
   void _submitForm(BuildContext context) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-
       final Future<UserModel> generatedUser = userProvider.getUserLogin(user);
+      
+      _toggleSubmitState();
+      generatedUser
+      .then((value) => {
 
-      generatedUser.then((value) => {
         if (value != null){
           if (value.status == 1) {
-            Navigator.pushNamed(context, '/home')
+            //controller.dispose(),
+            Timer(Duration(seconds: 2), () {
+              _toggleSubmitState();
+              // 5 seconds over, navigate to Page2.
+              Navigator.pushNamed(context, '/home');
+            })            
           }else{
+            //controller.dispose(),
+            
+            _toggleSubmitState(),
             Fluttertoast.showToast(
               msg: "Error al iniciar",
               toastLength: Toast.LENGTH_SHORT,
@@ -159,6 +187,9 @@ Widget _createForm(BuildContext context){
             )
           }
         }else{
+          //controller.dispose(),
+          
+          _toggleSubmitState(),
           Fluttertoast.showToast(
               msg: "Error al iniciar",
               toastLength: Toast.LENGTH_SHORT,
