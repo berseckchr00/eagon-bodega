@@ -10,6 +10,20 @@ class ReceptionPage extends StatefulWidget{
 
 }
 
+class OrderDetail{
+  const OrderDetail(
+    this.codigoProducto,
+    this.cantidad,
+    this.codigoProveedor,
+    this.glosa
+  );
+  final String codigoProducto;
+  final String cantidad;
+  final String glosa;
+  final String codigoProveedor;
+
+}
+
 class _OrdersPageState extends State<ReceptionPage>{
 
   final _formKey = GlobalKey<FormState>();
@@ -18,11 +32,18 @@ class _OrdersPageState extends State<ReceptionPage>{
   int currentStep = 0;
   bool complete = false;
   Item item;
-  order.Detail selectedDetail ;
+  OrderDetail _selectedOrder ;
 
   List<Step> steps;
   Stepper stepper;
+  Color _colorDetail;
   
+  @override
+  void didUpdateWidget (Widget oldWidget) {
+
+    super.didUpdateWidget(oldWidget);
+    
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -68,6 +89,9 @@ class _OrdersPageState extends State<ReceptionPage>{
   @override
   void initState() { 
     super.initState();
+    print(_colorDetail);
+    //print(_selectedOrder.codigoProducto);
+    _colorDetail = _getColorCard(false);
     /*this.item = ModalRoute.of(context).settings.arguments;*/
     _searchPendantReceptions(this._rut, this._folio).then((value) => 
       {
@@ -198,6 +222,7 @@ class _OrdersPageState extends State<ReceptionPage>{
 
     return steps;
   }
+  
   TextFormField _createTextStep(String label, String value, bool readOnly, {bool multiline = false}){
     return (multiline)? TextFormField(
         decoration: InputDecoration(labelText: label),
@@ -217,14 +242,21 @@ class _OrdersPageState extends State<ReceptionPage>{
     List<Widget> _det = [];
     List<order.Detail> _detOc = (oc != null)?oc.data.details:[];
     List<String> _lstDetailOc = [];
+    List<OrderDetail> ocDetail = [];
 
     items.forEach((element) {
       if (_detOc.isNotEmpty){
         _detOc.forEach((element) {
           _lstDetailOc.add(element.codigoProducto);
+          ocDetail.add(new OrderDetail(
+            element.codigoProducto,
+            element.cantidad,
+            element.codigoProveedor,
+            element.glosa
+          ));
         }); 
       }
-      _det.add(_createDetailCard(element, _detOc));
+      _det.add(_createDetailCard(element, ocDetail));
     });
 
     return _det;
@@ -234,9 +266,10 @@ class _OrdersPageState extends State<ReceptionPage>{
     return (!status)?Colors.orange.shade200:Colors.greenAccent.shade200;
   }
 
-  Widget _createDetailCard(Item it, List<order.Detail> lstDetailOc){
+  Widget _createDetailCard(Item it, List<OrderDetail> lstDetailOc){
+
     return Card(
-      color: _getColorCard(false),
+      color: _colorDetail,
       child: Column(
         children: [
           ListTile(
@@ -280,33 +313,53 @@ class _OrdersPageState extends State<ReceptionPage>{
               ]      
             )        
           ),
-          new DropdownButton<order.Detail>(
-                hint: new Text(
-                    (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin OC", 
-                    style:  new TextStyle(color: Colors.black)),
-                value: selectedDetail,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                iconSize: 24,
-                onChanged: (order.Detail newValue) {
-                    setState(() {
-                        selectedDetail = newValue ;
-                        _getColorCard(true);
-                        print(selectedDetail.codigoProducto);
-                    });
-                  },
-                items: lstDetailOc.map((order.Detail value) {
-                  return new DropdownMenuItem(
-                    value: value,
-                    child: Text(
-                      value.codigoProducto,
-                      style: new TextStyle(color: Colors.black))
-                  );
-                }).toList()
-              )
+          new DropdownButton<OrderDetail>(
+            hint: new Text(
+                (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin OC", 
+                style:  new TextStyle(color: Colors.black)),
+            value: _selectedOrder,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+            iconSize: 24,
+            onChanged: _changeValueDropDown,
+            //items: _getDropDownMenuItemOrder(lstDetailOc)
+            items: lstDetailOc.map((OrderDetail order) {
+              return new DropdownMenuItem<OrderDetail>(
+                value: order,
+                child: new Text(
+                  order.codigoProducto + ' '+order.glosa
+                )
+              );
+            }).toList()
+          )
         ],
       )
-      
     );
+  }
+
+  void _changeValueDropDown(OrderDetail newValue){
+    setState(() {
+        _selectedOrder = newValue ;
+    });
+
+    setState(() {
+        _colorDetail = _getColorCard(true);
+    });
+  }
+
+  List<DropdownMenuItem<OrderDetail>> _getDropDownMenuItemOrder(List<OrderDetail> lstDetailOc){
+    List<DropdownMenuItem<OrderDetail>> lista = new List();
+    lstDetailOc.forEach((element) {
+      lista.add(
+        DropdownMenuItem(
+          child: Text(
+            element.codigoProducto + ' '+element.glosa
+          ),
+          value: element,
+        )
+      );
+    });
+
+    return lista;
   }
 
   Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async{
