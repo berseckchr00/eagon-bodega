@@ -1,13 +1,13 @@
+
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ReceptionPage extends StatefulWidget{
   
   @override
-  _ReceptionPageState createState() => new _ReceptionPageState();
+  _OrdersPageState createState() => new _OrdersPageState();
 
 }
 
@@ -25,7 +25,7 @@ class OrderDetail{
 
 }
 
-class _ReceptionPageState extends State<ReceptionPage>{
+class _OrdersPageState extends State<ReceptionPage>{
 
   final _formKey = GlobalKey<FormState>();
   final _folio =  '65778';
@@ -39,11 +39,30 @@ class _ReceptionPageState extends State<ReceptionPage>{
   Stepper stepper;
   Color _colorDetail;
   
+  List<Widget> _details;
+
   @override
   void didUpdateWidget (Widget oldWidget) {
 
     super.didUpdateWidget(oldWidget);
-    
+    _searchPendantReceptions(this._rut, this._folio).then((value) => 
+      {
+        if(value.data.head.ref != null){
+          _searchPurchaseOrder(value.data.head.ref).then((oc_data) => {
+          
+            setState(() {
+              steps = _createSteps(context, value, oc_data);
+              _details = _createDetail(context,value.data.items, oc_data);
+            })
+          })
+        }else{
+          setState(() {
+            steps = _createSteps(context, value, null);
+          })
+        }
+        
+      }
+    );
   }
   
   @override
@@ -57,35 +76,7 @@ class _ReceptionPageState extends State<ReceptionPage>{
         title: Text('Recepción'),
       ),
       body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Stepper(
-              currentStep: currentStep,
-              onStepContinue: onStepContinue,
-              onStepTapped: (step)=>onStepGoTo(step),
-              onStepCancel: onStepCancel,
-              controlsBuilder: (BuildContext context,
-                  {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-                return Row(
-                  children: <Widget>[
-                    TextButton(
-                      onPressed: onStepCancel,
-                      child: Text('Anterior'),
-                    ),
-                    TextButton(
-                      onPressed: (!complete)?onStepContinue:
-                      (){
-                        //Navigator.pushNamed(context, '/reception_assign');
-                      },
-                      child: Text('Siguiente'),
-                    ),
-                  ],
-                );
-              },
-              steps: (steps != null)?steps:_createStepsDummy(),
-            )
-          )
-        ]
+        children: _details
       ),
     );
   }
@@ -93,7 +84,9 @@ class _ReceptionPageState extends State<ReceptionPage>{
   @override
   void initState() { 
     super.initState();
+    //print(_selectedOrder.codigoProducto);
     _colorDetail = _getColorCard(false);
+    /*this.item = ModalRoute.of(context).settings.arguments;*/
     _searchPendantReceptions(this._rut, this._folio).then((value) => 
       {
         if(value.data.head.ref != null){
@@ -101,6 +94,7 @@ class _ReceptionPageState extends State<ReceptionPage>{
           
             setState(() {
               steps = _createSteps(context, value, oc_data);
+              _details = _createDetail(context,value.data.items, oc_data);
             })
           })
         }else{
@@ -116,7 +110,7 @@ class _ReceptionPageState extends State<ReceptionPage>{
   onStepContinue(){
     currentStep + 1 != steps.length
       ?onStepGoTo(currentStep + 1)
-      :setState((){ complete = true;Navigator.pushNamed(context, '/reception_assign');});
+      :setState(()=> complete = true);
   }
 
   onStepCancel(){
@@ -158,14 +152,6 @@ class _ReceptionPageState extends State<ReceptionPage>{
         ),
       ),
       Step(
-        title: const Text('Detalle documento'),
-        isActive: true,
-        state: StepState.complete,
-        content: Column(
-          children: _createDetail(context,detail, oc)
-        )
-      ),
-      Step(
         title: const Text('Datos OC'),
         isActive: true,
         state: StepState.complete,
@@ -183,11 +169,19 @@ class _ReceptionPageState extends State<ReceptionPage>{
             ],
             ),
             _createTextStep('Numero',(oc != null)?oc.data.head.numero:'', true),
-            _createTextStep('Fecha',(oc != null)? DateFormat.yMd().format(oc.data.head.fecha):'', true),
+            _createTextStep('Fecha',(oc != null)?oc.data.head.fecha.toString():'', true),
             _createTextStep('Porcentaje Asignado',(oc != null)?oc.data.head.porcentajeAsignado:'', true),
           ],
         )
-      )
+      ),
+      Step(
+        title: const Text('Detalle documento'),
+        isActive: true,
+        state: StepState.complete,
+        content: Column(
+          children: _createDetail(context,detail, oc)
+        )
+      ),
     ];
 
     return steps;
@@ -205,6 +199,13 @@ class _ReceptionPageState extends State<ReceptionPage>{
         )
       ),
       Step(
+        title: const Text('Detalle OC'),
+        isActive: true,
+        state: StepState.complete,
+        content: Column(
+          children: []
+        )
+      ), Step(
         title: const Text('Datos documento'),
         isActive: true,
         state: StepState.complete,
@@ -212,14 +213,6 @@ class _ReceptionPageState extends State<ReceptionPage>{
           children: []
         )
       ),
-      Step(
-        title: const Text('Detalle OC'),
-        isActive: true,
-        state: StepState.complete,
-        content: Column(
-          children: []
-        )
-      )
     ];
 
     return steps;
@@ -269,7 +262,33 @@ class _ReceptionPageState extends State<ReceptionPage>{
   }
 
   Widget _createDetailCard(Item it, List<OrderDetail> lstDetailOc){
-    return Card(
+    return Column(
+      children: [
+      new DropdownButton<OrderDetail>(
+          selectedItemBuilder: (context){
+            return [Text(_selectedOrder.glosa)];
+          },
+            hint: new Text(
+                (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin Orden de Compra", 
+                style:  new TextStyle(color: Colors.black)),
+            value: _selectedOrder,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+            iconSize: 24,
+            onChanged: _changeValueDropDown,
+            //items: _getDropDownMenuItemOrder(lstDetailOc)
+            items: lstDetailOc.map((OrderDetail order) {
+              return new DropdownMenuItem<OrderDetail>(
+                value: order,
+                child: new Text(
+                  order.codigoProducto + ' '+order.glosa,
+                  style:  new TextStyle(color: Colors.black, fontSize: 14)
+                )
+              );
+            }).toList()
+          )
+      ]
+    );
+    /*return Card(
       color: _colorDetail,
       child: Column(
         children: [
@@ -284,38 +303,69 @@ class _ReceptionPageState extends State<ReceptionPage>{
             title: Text(it.nmbItem),
             subtitle: Row(
               children:[
-                Text('Tipo Medida | ',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal
-                    )
+                Expanded(
+                child: 
+                TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Cantidad',
+                       hintStyle: TextStyle(
+                         color: Colors.orange.shade300
+                       ),
+                       labelStyle: TextStyle(
+                         color: Colors.orange.shade900
+                       ), 
+                    ),
+                    readOnly: false,
+                    initialValue: it.qtyItem,
+                    keyboardType: TextInputType.number,
+                    maxLines: null,
+                    style: TextStyle(
+                      fontSize: 18
+                    ),
+                  )
                 ),
                 Text(it.unmdItem,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  
-                ),
-                
-              ]      
-            ),
-            trailing: 
-            Column(
-              children:[
-                Text('Cantidad'),
-                Text(it.qtyItem,
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.normal
                     )
                 ),
               ]      
-            )
+            )        
           ),
+          new DropdownButton<OrderDetail>(
+            hint: new Text(
+                (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin Orden de Compra", 
+                style:  new TextStyle(color: Colors.black)),
+            value: _selectedOrder,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+            iconSize: 24,
+            onChanged: _changeValueDropDown,
+            //items: _getDropDownMenuItemOrder(lstDetailOc)
+            items: lstDetailOc.map((OrderDetail order) {
+              return new DropdownMenuItem<OrderDetail>(
+                value: order,
+                child: new Text(
+                  order.codigoProducto + ' '+order.glosa,
+                  style:  new TextStyle(color: Colors.black, fontSize: 14)
+                )
+              );
+            }).toList()
+          )
         ],
       )
-    );
+    );*/
+  }
+
+  void _changeValueDropDown(OrderDetail newValue){
+    setState(() {
+        _selectedOrder = newValue ;
+        print(_selectedOrder.codigoProducto);
+    });
+
+    setState(() {
+        _colorDetail = _getColorCard(true);
+    });
   }
 
   Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async{

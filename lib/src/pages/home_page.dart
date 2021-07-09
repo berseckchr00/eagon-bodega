@@ -313,8 +313,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _pendingReception(BuildContext context, Item item) {
- 
-    var fchEmis = DateFormat.yMd().format(item.fchEmis);
+    
+    final f = new DateFormat('dd/MM/yyyy');
+
+    var fchEmis = f.format(item.fchEmis);
 
     return Card(
       
