@@ -141,7 +141,10 @@ class _ReceptionPageState extends State<ReceptionPage>{
 
       Head data = dte.data.head;
       List<Item> detail = dte.data.items;
-
+      final f = new DateFormat('dd/MM/yyyy');
+      var fchEmis = f.format(data.fchEmis);
+      var fchEmisOc = (oc != null)?f.format(oc.data.head.fecha):'';
+      
       List<Step> steps = [
       Step(
         title: const Text('Datos generales'),
@@ -152,7 +155,7 @@ class _ReceptionPageState extends State<ReceptionPage>{
             _createTextStep('Folio',data.dteFolio, true),
             _createTextStep('Rut Emisor',data.rutEmisor, true),
             _createTextStep('Razón Social',data.rznSoc, true),
-            _createTextStep('Fecha Emisión',data.fchEmis.toString(), true),
+            _createTextStep('Fecha Emisión',fchEmis, true),
             _createTextStep('Dirección Origen',data.dirOrigen, true)
           ],
         ),
@@ -183,8 +186,8 @@ class _ReceptionPageState extends State<ReceptionPage>{
             ],
             ),
             _createTextStep('Numero',(oc != null)?oc.data.head.numero:'', true),
-            _createTextStep('Fecha',(oc != null)? DateFormat.yMd().format(oc.data.head.fecha):'', true),
-            _createTextStep('Porcentaje Asignado',(oc != null)?oc.data.head.porcentajeAsignado:'', true),
+            _createTextStep('Fecha',(oc != null)? fchEmisOc:'', true),
+            _createTextStep('Porcentaje Asignado',(oc != null)?oc.data.head.porcentajeAsignado +' %':'0 %', true),
           ],
         )
       )

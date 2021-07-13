@@ -17,11 +17,18 @@ class _HomePageState extends State<HomePage> {
   final Map<String, String> _formData = {'rut': null, 'folio': null};
   final _formKey = GlobalKey<FormState>();
   final prefs = new PreferenciasUsuario();
+  List<Widget> _cardReception;
   
   var folioDte = 0;
   var rutDte = "";
+  
+  bool submitting = false;
 
-  List<Widget> _cardReception;
+  void _toggleSubmitState() {
+    setState(() {
+      submitting = !submitting;
+    });
+  }
 
   @override
   void initState() { 
@@ -55,7 +62,9 @@ class _HomePageState extends State<HomePage> {
         //leading: Icon(Icons.menu)
       ),
       //body: _createLista(),
-      body: _createHorizontalView(context)//_homeView(),
+      body: (!submitting)
+            ?_createHorizontalView(context)
+            :const Center(child: const CircularProgressIndicator())//_homeView(),
     );
   }
 
@@ -460,18 +469,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Widget>> _loadPendantReceptions() async{
+    
+    _toggleSubmitState();
     ReceptionProvider reception = new ReceptionProvider();
     DteModel _dte = await reception.getDteList();   
     List<Widget> _boxes;
-
+    
     if (_dte != null && _dte.data.items != null){
       _boxes = _setBoxes(_dte.data.items);    
     }   
 
-   return _boxes;
+    _toggleSubmitState();
+    return _boxes;
   }
 
   Future<List<Widget>> _searchPendantReceptions(String rut, String folio) async{
+    _toggleSubmitState();
     ReceptionProvider reception = new ReceptionProvider();
     DteModel _dte = await reception.getDteDetail(rut, folio);   
     List<Widget> _boxes;
@@ -480,7 +493,6 @@ class _HomePageState extends State<HomePage> {
     if (_dte != null && _dte.data.items != null){
       Head head = _dte.data.head;
       _dte.data.items.forEach((element) {
-        print(element.toJson().toString());
         Item item = Item.fromJson(element.toJson());
         item.fchEmis  = head.fchEmis;
         item.rznSoc   = head.rznSoc;  
@@ -490,7 +502,7 @@ class _HomePageState extends State<HomePage> {
 
       _boxes = _setBoxes(items);       
     }
-
+    _toggleSubmitState();
    return _boxes;
   }
 

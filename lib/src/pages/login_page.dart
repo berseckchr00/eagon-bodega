@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage>
         if (value != null){
           if (value.status == 1) {
             //controller.dispose(),
-            Timer(Duration(seconds: 2), () {
+            Timer(Duration(seconds: 1), () {
               _toggleSubmitState();
               // 5 seconds over, navigate to Page2.
               Navigator.pushNamed(context, '/home');

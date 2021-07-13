@@ -50,18 +50,24 @@ class Detail {
         this.cantidad,
         this.glosa,
         this.codigoProveedor,
+        this.linea,
+        this.unidadIngreso
     });
 
     String codigoProducto;
     String cantidad;
     String glosa;
     String codigoProveedor;
+    String linea;
+    String unidadIngreso;
 
     factory Detail.fromJson(Map<String, dynamic> json) => Detail(
         codigoProducto: json["CODIGO_PRODUCTO"],
         cantidad: json["CANTIDAD"],
         glosa: json["GLOSA"],
         codigoProveedor: json["CODIGO_PROVEEDOR"],
+        linea: json["LINEA"],
+        unidadIngreso: json["UNIDADINGRESO"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -69,6 +75,8 @@ class Detail {
         "CANTIDAD": cantidad,
         "GLOSA": glosa,
         "CODIGO_PROVEEDOR": codigoProveedor,
+        "LINEA": linea,
+        "UNIADINGREOS": unidadIngreso,
     };
 }
 
