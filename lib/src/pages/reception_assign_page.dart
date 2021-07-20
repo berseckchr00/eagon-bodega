@@ -1,7 +1,8 @@
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
+import 'package:eagon_bodega/src/providers/dropdown_provider.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
-import 'package:eagon_bodega/src/utils/form_utils.dart' as form_utils;
 import 'package:eagon_bodega/src/models/dte_model.dart';
+import 'package:eagon_bodega/src/utils/dropdown_utils.dart';
 import 'package:flutter/material.dart';
 
 class ReceptionAssignPage extends StatefulWidget {
@@ -10,35 +11,59 @@ class ReceptionAssignPage extends StatefulWidget {
   State createState() => _ReceptionAssignPage();
 }
 
-class DataTest {
-  const DataTest(this.name);    
-  final String name;
-}
 
 class _ReceptionAssignPage extends State<ReceptionAssignPage> {
 
+
+  DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider2 = new
+  DropDownPurchaseOrderProvider();
+
+  DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider3 = new
+  DropDownPurchaseOrderProvider();
+
+  
+
+  final _formKey = GlobalKey<FormState>();
+
   final _folio =  '65778';
   final _rut = '96817490-8';
-
+  
+  
   List<Widget> _detail;
-  DataTest _selectedOrder;
-  DataTest selectedUser;
-  List<DataTest> dataTestObj = <DataTest>[DataTest('REGULADOR 114799 0-6\"'), DataTest('SOPORTE REDONDO FC-206  30')];
-  Widget dropDown;
+  List<Widget> _dropDownList = [];
+
   String _ocNumber;
+  String _ocRef;
 
   @override
   Widget build(BuildContext context) {
     final title = 'Recepción Orden de Compra';
-
-    /*return MaterialApp(
-      title: title,
-      home: Scaffold(
-        body : Container(
-          margin: EdgeInsets.only(top: 500),
-          child:_generateDropDown(dataTestObj))
-      )
-    );*/
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter Custom Dropdown'),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Column(
+                children: (_detail != null)?_detail:[],
+              ),
+            )/* ,
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Column(
+                children:(_dropDownList != null)?_dropDownList:[],
+              )
+            ), */
+          ],
+        ),
+        
+      ),
+    );
 
     return Scaffold(
         body: CustomScrollView(
@@ -83,104 +108,99 @@ class _ReceptionAssignPage extends State<ReceptionAssignPage> {
 
   @override
   void initState() { 
-    super.initState();
 
     _searchPendantReceptions(this._rut, this._folio).then((value) => 
       {
         if(value.data.head.ref != null){
-          _searchPurchaseOrder(value.data.head.ref).then((ocData) => {
+          _ocRef = value.data.head.ref,
+          _searchPurchaseOrder(_ocRef).then((ocData) => {
           
+            /*ocData.data.details.forEach((element) {
+              lstProv.add(new PurchaseOrderClass(
+                  productCode: element.codigoProducto,
+                  productGlosa: element.glosa
+                ));
+              /*_dropDownPurchaseOrderProvider.getPurchaseModelList().add(
+                new PurchaseOrderClass(
+                  productCode: element.codigoProducto,
+                  productGlosa: element.glosa
+                )
+              );*/
+            }),*/
+
             setState(() {
               _ocNumber = ocData.data.head.numero;
               //_header = _generate_datos_oc(ocData);
-              _detail = _generate_detail_oc(ocData.data.details);
-              //dropDown = _generateDropDown(ocData.data.details);
+              
+              _detail = _generateDetailOc(ocData.data.details);
+
+              ocData.data.details.forEach((element) {
+                DropDownPurchaseOrderProvider provider = setDropDownPurchaseOrderProvider();
+
+                ocData.data.details.forEach((element) {
+                  
+                  provider.getPurchaseModelList().add(
+                    new PurchaseOrderClass(
+                      productCode: element.codigoProducto,
+                      productGlosa: element.glosa
+                    )
+                  );
+                });
+
+                provider.setPurchaseModelDropdownList(
+                  provider.buildPurchaseModelDropdown(
+                    provider.getPurchaseModelList()
+                  )
+                );  
+                
+                provider.setPurchaseModel(provider.getPurchaseModelList()[0]);
+
+                
+                _dropDownList.add( _generateDropDown('1', provider));
+              });
+              
+              //_dropDown = _generateDropDown();
             })
           })
         }else{
           setState(() {
             //_header = _generate_datos_oc(null);
             _detail = [];
+            _dropDownList = [];
           })
         }
         
       }
     );
+    
+    super.initState();
   }
 
-  List<Widget> _generate_detail(PurchaseOrderModel orderModel, List<Item> detailItems) {
-    List<Widget> _det = [];
-    List<Detail> _detOrder = (orderModel != null)?orderModel.data.details:[];
-
-    detailItems.forEach((element) {
-      _det.add(_createDetailCard(element, _detOrder));
+  _onChangePurchaseModelDropdown2(PurchaseOrderClass favouriteFoodModel) {
+    setState(() {
+      _dropDownPurchaseOrderProvider2.setPurchaseModel(favouriteFoodModel);
     });
-    
-    return _det;
+  }
+  _onChangePurchaseModelDropdown3(PurchaseOrderClass favouriteFoodModel) {
+    setState(() {
+      _dropDownPurchaseOrderProvider3.setPurchaseModel(favouriteFoodModel);
+    });
   }
 
-  Widget _createDetailCard(Item it, List<Detail> lstDetailOc){
+  
+
+
+  Widget _createDetailCardOc(
+    Detail orderItem, 
+    String key, 
+    DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider){
     
-    return Container(
+    return /*Container(
       color: Colors.grey.shade300,
       //padding: EdgeInsets.all(20.0),
       margin: EdgeInsets.all(10.0),
       child: Column(
-        children: [
-          ListTile(
-            leading: Text(
-              it.nroLinDet,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold
-              ),
-            ),
-            title: Text(it.nmbItem),
-            subtitle: Row(
-              children:[
-                Expanded(
-                child: 
-                TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Cantidad',
-                       hintStyle: TextStyle(
-                         color: Colors.orange.shade300
-                       ),
-                       labelStyle: TextStyle(
-                         color: Colors.orange.shade900
-                       ), 
-                    ),
-                    readOnly: false,
-                    initialValue: it.qtyItem,
-                    keyboardType: TextInputType.number,
-                    maxLines: null,
-                    style: TextStyle(
-                      fontSize: 18
-                    ),
-                  )
-                ),
-                Text(it.unmdItem,
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal
-                    )
-                ),
-              ]      
-            )        
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _createDetailCardOc(Detail orderItem){
-    
-    return Container(
-      color: Colors.grey.shade300,
-      //padding: EdgeInsets.all(20.0),
-      margin: EdgeInsets.all(10.0),
-      child: Column(
-        children: [
+        children: [*/
           ListTile(
             leading: Text(
               orderItem.linea,
@@ -211,8 +231,10 @@ class _ReceptionAssignPage extends State<ReceptionAssignPage> {
                     style: TextStyle(
                       fontSize: 18
                     ),
-                  )
+                  ),
+                 
                 ),
+
                 Text(orderItem.unidadIngreso,
                   style: TextStyle(
                       fontSize: 18,
@@ -220,50 +242,89 @@ class _ReceptionAssignPage extends State<ReceptionAssignPage> {
                     )
                 ),
               ]      
-            )        
-          )
-        ],
+            ),
+            trailing: 
+              IconButton(
+                icon: const Icon(Icons.find_in_page_rounded),
+                tooltip: 'Asignar detalle',
+                onPressed: () { 
+                  //_showOrderDialog(context, key, _dropDownPurchaseOrderProvider);
+                },
+              ),
+            );    
+        /*],
       ),
-    );
+    );*/
   }
 
 
-  List<Widget> _generate_detail_oc(List<Detail> listOrder){
+  Future<void> _showOrderDialog(
+    BuildContext context, 
+    String key, 
+    DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider) async{
+
+    return await showDialog(
+      context: context, 
+      builder: (context){
+        return StatefulBuilder(builder: (conext, setState){
+          return AlertDialog(
+            content: Form(
+              key: _formKey,
+              child:  _generateDropDown(key, _dropDownPurchaseOrderProvider),
+            ),
+          );
+        });
+      });
+  }
+
+  List<Widget> _generateDetailOc(List<Detail> listOrder){
+    
     List<Widget> _det = [];
+    int index = 1;
+
     listOrder.forEach((element) {
-      _det.add(_createDetailCardOc(element));
-      _det.add(_generateDropDown(dataTestObj));
-    });
+      DropDownPurchaseOrderProvider provider = setDropDownPurchaseOrderProvider();
+
+      listOrder.forEach((element) {
+        
+        provider.getPurchaseModelList().add(
+          new PurchaseOrderClass(
+            productCode: element.codigoProducto,
+            productGlosa: element.glosa
+          )
+        );
+      });
+
+      provider.setPurchaseModelDropdownList(
+        provider.buildPurchaseModelDropdown(
+          provider.getPurchaseModelList()
+        )
+      );  
+
+      provider.setPurchaseModel(provider.getPurchaseModelList()[0]);
+      _det.add(_createDetailCardOc(element, index.toString(), provider));
+      _det.add( _generateDropDown(index.toString(), provider));
+      index ++;
+    }); 
 
     return _det;
   }
 
-  Widget _generateDropDown(List<DataTest>lstDetailOc){
-    return new DropdownButton<DataTest>(
-            hint: new Text(
-                (lstDetailOc.isNotEmpty)?"Seleccione un producto":"Sin Orden de Compra", 
-                style:  new TextStyle(color: Colors.black)),
-            value: _selectedOrder,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded),
-            iconSize: 24,
-            onChanged: (DataTest newValue){
-              _selectedOrder = newValue ;
-              this.setState(() {
-                print(newValue.name);
-              });
-            },
-            //items: _getDropDownMenuItemOrder(lstDetailOc)
-            items: lstDetailOc.map((DataTest order) {
-              return new DropdownMenuItem<DataTest>(
-                value: order,
-                child: new Text(
-                  //order.codigoProducto + ' '+order.glosa,
-                  order.name,
-                  style:  new TextStyle(color: Colors.black, fontSize: 14)
-                )
-              );
-            }).toList()
-          );
+  Widget _generateDropDown(
+    String key,
+    DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider){
+
+    return new DropdownUtils(
+        key: Key(key),
+        dropdownMenuItemList: _dropDownPurchaseOrderProvider.getPurchaseModelDropdownList(),
+        onChanged: (value){
+          this.setState(() {
+            _dropDownPurchaseOrderProvider.setPurchaseModel(value);
+          });
+        },
+        value: _dropDownPurchaseOrderProvider.getPurchaseModel(),
+        isEnabled: true,
+      );
   }
   
   Future<DteModel> _searchPendantReceptions(String rut, String folio) async{
@@ -279,6 +340,13 @@ class _ReceptionAssignPage extends State<ReceptionAssignPage> {
     return _porder;
   }
 
-  
+  DropDownPurchaseOrderProvider setDropDownPurchaseOrderProvider(){
+
+    DropDownPurchaseOrderProvider _dropDownPurchaseOrderProvider = new
+    DropDownPurchaseOrderProvider();
+
+           
+    return _dropDownPurchaseOrderProvider;
+  }  
 
 }

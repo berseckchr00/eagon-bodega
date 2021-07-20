@@ -116,7 +116,7 @@ class _ReceptionPageState extends State<ReceptionPage>{
   onStepContinue(){
     currentStep + 1 != steps.length
       ?onStepGoTo(currentStep + 1)
-      :setState((){ complete = true;Navigator.pushNamed(context, '/reception_assign');});
+      :setState((){ complete = true;Navigator.pushNamed(context, '/reception_list');});
   }
 
   onStepCancel(){

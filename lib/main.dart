@@ -41,6 +41,22 @@ class MyApp extends StatelessWidget {
           builder: ( BuildContext context ) => LoginPage()
         );
       },
+      /* theme: ThemeData(
+        // Define the default brightness and colors.
+        brightness: Brightness.dark,
+        primaryColor: Colors.orange[800],
+        accentColor: Colors.grey[600],
+
+        // Define the default font family.
+        //fontFamily: 'Georgia',
+
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+       /*  textTheme: TextTheme(
+          bodyText1: TextStyle(color: Colors.grey[800]),
+          body1: TextStyle(color: Colors.grey[800]),
+        ), */
+      ), */
     );
   }
 }

@@ -84,4 +84,28 @@ class ReceptionProvider{
       return null;
     }
   }
+
+  Future<List<Detail>> getOcListDetail(String nmro_oc) async{
+    
+    var uri = Uri.parse('$_url/reception.php/getDocumentOcList/$nmro_oc');
+    Map<String, String> headers = {
+      "content-type"  : "application/x-www-form-urlencoded",
+      'Authorization' : EnviromentConfig().getApiKey(),
+      'ci_session'    : prefs.ciSession
+    };
+
+    var data;
+    try{
+      
+      final resp = await http.get(uri, headers: headers);
+      data = Utf8Codec().decode(resp.bodyBytes);
+      print(data);
+      final oc = PurchaseOrderModel.fromJson(jsonDecode(data));
+      return oc.data.details;
+      //List<Dte> lstDte = new 
+
+    }catch(ex){
+      return null;
+    }
+  }
 }
