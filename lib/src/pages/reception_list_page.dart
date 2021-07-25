@@ -1,10 +1,21 @@
 /// Flutter code sample for ReorderableListView
 
+import 'dart:convert';
+
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+class ReceptionArguments{
+
+  final String detailPurchase;
+  final String detailReception;
+
+  ReceptionArguments(this.detailPurchase, this.detailReception);
+  
+}
 /// This is the main application widget.
 class ReceptionOrderList extends StatelessWidget {
   
@@ -108,7 +119,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                   primary: Colors.orange
                 ),
                 onPressed: (){
-                  Fluttertoast.showToast(
+                  _checkList();
+                  /*Fluttertoast.showToast(
                     msg: "Not Implemented yet!",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.CENTER,
@@ -116,9 +128,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     backgroundColor: Colors.orange,
                     textColor: Colors.white,
                     fontSize: 16.0
-                  );
+                  );*/
                 }, 
-                child: Text("Seguiente"),
+                child: Text("Siguiente"),
                     
                 )
             ],
@@ -154,49 +166,54 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             children: <Widget>[
               for (int index = 0; index < _items.length; index++)
                 //_generateItemList(_itemsDetail[index], index)
-                ListTile(
-                  minVerticalPadding: 10,
+                Column(
                   key: Key('$index'),
-                  tileColor: _items[index].isOdd ? oddItemColorDetail : evenItemColorDetail,
-                  title: Text('${_itemsDetail[index].nmbItem}'),
-                  subtitle: Row(
-                    children: [
-                      Text(
-                        'Cant.: ',
-                        style: TextStyle(
-                          fontSize: 16
-                        ),
+                  children: [
+                    ListTile(
+                      minVerticalPadding: 10,
+                      tileColor: _items[index].isOdd ? oddItemColorDetail : evenItemColorDetail,
+                      title: Text('${_itemsDetail[index].nmbItem}'),
+                      subtitle: Row(
+                        children: [
+                          Text(
+                            'Cant.: ',
+                            style: TextStyle(
+                              fontSize: 16
+                            ),
+                          ),
+                          Expanded(
+                            child: 
+                            TextFormField(
+                              initialValue: double.parse(_itemsDetail[index].qtyItem).toString(),
+                              style: TextStyle(fontSize: 14.0),
+                              readOnly: true,
+                              textAlign: TextAlign.center,
+                              validator: (value){
+                                if(value.isEmpty || double.parse(value) < 1){
+                                  return 'Cantidad Invalida';
+                                }
+                                return null;
+                              },
+                              onSaved: (String value) {
+                                print(value);
+                              },
+                            ),
+                          ),
+                          Text(
+                            ' ${_itemsDetail[index].unmdItem}',
+                            style: TextStyle(
+                              fontSize: 16
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: 
-                        TextFormField(
-                          initialValue: double.parse(_itemsDetail[index].qtyItem).toString(),
-                          style: TextStyle(fontSize: 14.0),
-                          readOnly: true,
-                          textAlign: TextAlign.center,
-                          validator: (value){
-                            if(value.isEmpty || double.parse(value) < 1){
-                              return 'Cantidad Invalida';
-                            }
-                            return null;
-                          },
-                          onSaved: (String value) {
-                            print(value);
-                          },
-                        ),
-                      ),
-                      Text(
-                        ' ${_itemsDetail[index].unmdItem}',
-                        style: TextStyle(
-                          fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right_sharp
-                  ),
-                ),
+                    ),
+                    Divider(
+                      color: Colors.grey.shade900,
+                    )
+                  ],
+                )
+                
             ],
             onReorder: (int oldIndex, int newIndex) {
               setState(() {
@@ -218,49 +235,61 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             children: <Widget>[
               for (int index = 0; index < _itemsOrder.length; index++)
                 //_generateOrderDetailList(_itemsOrderDetail[index], index)
-                 ListTile(
-                  minVerticalPadding: 10,
-                  key: Key('$index'),
-                  tileColor: _itemsOrder[index].isOdd ? oddItemColor : evenItemColor,
-                  title: Text('${_itemsOrderDetail[index].glosa}'),
-                  subtitle: Row(
-                    children: [
-                      Text(
-                        'Cant.: ',
-                        style: TextStyle(
-                          fontSize: 16
-                        ),
+                 Column(
+                   key: Key('$index'),
+                   children: [
+                     ListTile(
+                        minVerticalPadding: 10,
+                        tileColor: _itemsOrder[index].isOdd ? oddItemColor : evenItemColor,
+                        title: Text('${_itemsOrderDetail[index].glosa}'),
+                        subtitle: Row(
+                          children: [
+                            Text(
+                              'Cant.: ',
+                              style: TextStyle(
+                                fontSize: 16
+                              ),
+                            ),
+                            Expanded(
+                              child: 
+                              TextFormField(
+                                initialValue: double.parse(_itemsOrderDetail[index].cantidad).toString(),
+                                style: TextStyle(fontSize: 16.0),
+                                //readOnly: true,
+                                textAlign: TextAlign.center,
+                                validator: (value){
+                                  if(value.isEmpty || double.parse(value) < 1){
+                                    return 'Cantidad Invalida';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (String value) {
+                                  print(value);
+                                  _itemsOrderDetail[index].cantidad = value;
+                                },
+                                onChanged: (String value){
+                                  _itemsOrderDetail[index].cantidad = value;
+                                },
+                              ),
+                            ),
+                            Text(
+                              ' ${_itemsOrderDetail[index].unidadIngreso}',
+                              style: TextStyle(
+                                fontSize: 16
+                              ),
+                            ),
+                          ],
+                        )
+                        /*leading: Icon(
+                          Icons.chevron_left_sharp
+                        ),*/
                       ),
-                      Expanded(
-                        child: 
-                        TextFormField(
-                          initialValue: double.parse(_itemsOrderDetail[index].cantidad).toString(),
-                          style: TextStyle(fontSize: 16.0),
-                          readOnly: true,
-                          textAlign: TextAlign.center,
-                          validator: (value){
-                            if(value.isEmpty || double.parse(value) < 1){
-                              return 'Cantidad Invalida';
-                            }
-                            return null;
-                          },
-                          onSaved: (String value) {
-                            print(value);
-                          },
-                        ),
-                      ),
-                      Text(
-                        ' ${_itemsOrderDetail[index].unidadIngreso}',
-                        style: TextStyle(
-                          fontSize: 16
-                        ),
-                      ),
-                    ],
-                  )
-                  /*leading: Icon(
-                    Icons.chevron_left_sharp
-                  ),*/
-                )
+                      Divider(
+                        color: Colors.red.shade900,
+                      )
+                   ],
+                 )
+                 
             ],
             onReorder: (int oldIndex, int newIndex) {
               setState(() {
@@ -282,6 +311,18 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ],
     ); 
   }
+  
+  void _checkList(){
+    String jsonOrder = jsonEncode(_itemsOrderDetail).toString();
+    print(jsonOrder);
+
+    Navigator.pushNamed(
+      context,
+      '/reception_quantity',
+      arguments: ReceptionArguments(jsonOrder, null),
+    );
+  }
+
   Future<DteModel> _searchPendantReceptions(String rut, String folio) async{
     ReceptionProvider reception = new ReceptionProvider();
     DteModel _dte = await reception.getDteDetail(rut, folio);      
