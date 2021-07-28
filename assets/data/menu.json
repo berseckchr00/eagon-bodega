@@ -14,6 +14,12 @@
             "divider": false
         },
         {
+            "ruta" : "/allocate",
+            "icon" : "assignment_returned_outlined",
+            "texto": "Asignar Ubicación",
+            "divider": false
+        },
+        {
             "ruta" : "/orders",
             "icon" : "accessibility",
             "texto": "Pedidos",

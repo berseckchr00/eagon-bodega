@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
+import 'package:eagon_bodega/src/models/reception_response.dart';
+import 'package:eagon_bodega/src/utils/string_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:eagon_bodega/src/config/enviroment_config.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
@@ -105,6 +107,35 @@ class ReceptionProvider{
       //List<Dte> lstDte = new 
 
     }catch(ex){
+      return null;
+    }
+  }
+
+  Future<ReceptionResponse> saveReception(String jsonData) async {
+
+    var uri = Uri.parse('$_url/reception.php/saveReception');
+
+    //TODO: encapsular en provider de prefs
+    Map<String, String> headers = {
+      "content-type"  : "application/x-www-form-urlencoded",
+      'Authorization' : EnviromentConfig().getApiKey(),
+      'ci_session'    : prefs.ciSession
+    };  
+    Map<String, String> queryParameters = {
+      "data": jsonData
+    };
+
+    var data;
+    try{
+
+      final resp = await http.post( uri, body: queryParameters,  headers: headers);
+      data = Utf8Codec().decode(resp.bodyBytes);
+      if (!isJson(data)) return null;
+
+      final validJson = jsonDecode(data);
+      return ReceptionResponse.fromJson(validJson);
+    }on Exception catch(e){
+      print(e);
       return null;
     }
   }

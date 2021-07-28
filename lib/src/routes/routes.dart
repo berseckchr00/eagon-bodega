@@ -1,4 +1,5 @@
 //import 'package:eagon_bodega/src/pages/alert_dialog_page.dart';
+import 'package:eagon_bodega/src/pages/allocate_page.dart';
 import 'package:eagon_bodega/src/pages/home_page.dart';
 import 'package:eagon_bodega/src/pages/login_page.dart';
 import 'package:eagon_bodega/src/pages/orders_page.dart';
@@ -20,6 +21,7 @@ Map <String,WidgetBuilder> getApplicationRoutes(){
     '/reception_assign' : (BuildContext context) => ReceptionAssignPage(),
     '/reception_list' : (BuildContext context) => ReceptionOrderList(),
     '/reception_quantity' : (BuildContext context) => ReceptionQuantity(),
+    '/allocate' : (BuildContext context) => AllocatePage(),
     //'/sortable_list' : (BuildContext context) => SortableList(),
     '/logout' : (BuildContext context) => LoginPage(),
     //'/alert' : (BuildContext context) => StatefulDialog(),

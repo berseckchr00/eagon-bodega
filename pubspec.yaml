@@ -28,6 +28,7 @@ dependencies:
   fluttertoast: ^8.0.7
   cupertino_icons: ^1.0.2
   intl: ^0.17.0
+  cool_alert: ^1.1.0
   http:
 
 dev_dependencies:
