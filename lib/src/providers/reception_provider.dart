@@ -130,6 +130,8 @@ class ReceptionProvider{
 
       final resp = await http.post( uri, body: queryParameters,  headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
+
+      print(data);
       if (!isJson(data)) return null;
 
       final validJson = jsonDecode(data);

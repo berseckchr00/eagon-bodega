@@ -290,8 +290,8 @@ class _AllocatePageState extends State<AllocatePage> {
               ),
               TextButton(
                 onPressed: (){
-                  //Navigator.pushNamed(context, '/reception', arguments: item);
-                  Fluttertoast.showToast(
+                  Navigator.pushNamed(context, '/allocate_assign', arguments: item);
+                  /* Fluttertoast.showToast(
                     msg: "Sin Implementar",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.CENTER,
@@ -299,7 +299,7 @@ class _AllocatePageState extends State<AllocatePage> {
                     backgroundColor: Colors.red,
                     textColor: Colors.white,
                     fontSize: 16.0
-                  );
+                  ); */
                 }, 
                 child: Text('Recepcionar')
               )
