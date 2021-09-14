@@ -9,92 +9,154 @@ class OrdersPage extends StatefulWidget{
 
 class _OrdersPageState extends State<OrdersPage>{
 
-  int currentStep = 0;
-  bool complete = false;
-
-  List<Step> steps = [
-    Step(
-      title: const Text('Datos generales'),
-      isActive: true,
-      state: StepState.complete,
-      content: Column(
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Email'),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Cantidad'),
-          )
-        ],
-      )
-    ),
-    Step(
-      title: const Text('Datos documento'),
-      isActive: true,
-      state: StepState.complete,
-      content: Column(
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Direccion'),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Proveedor'),
-          )
-        ],
-      )
-    ),
-    Step(
-      title: const Text('Detalle OC'),
-      isActive: true,
-      state: StepState.complete,
-      content: Column(
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Item'),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Cantidad'),
-          )
-        ],
-      )
-    )
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text('Recepción'),
+        title: Text("Pedidos",
+            style: TextStyle(fontSize: 18)
+          ),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Expanded(child: Stepper(
-            type: StepperType.vertical,
-            steps : steps,
-            currentStep: currentStep,
-            onStepContinue: next,
-            onStepTapped: (step)=>goTo(step),
-            onStepCancel: cancel,
-          ))
-        ]
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: RaisedButton(
+                    onPressed: () {
+                      _showMyDialog(context);
+                    },
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    elevation: 1.5,
+                    color: Colors.orange.shade300,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.developer_board,
+                        size: 100,),
+                        SizedBox(height: 5),
+                        Text("Orden de Trabajo",
+                            style: TextStyle(fontSize: 18),
+                            textAlign: TextAlign.center
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 24),
+                Expanded(
+                  child: RaisedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/orders_input");
+                    },
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    elevation: 1.5,
+                    color: Colors.grey.shade300,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.style_outlined,
+                        size: 100,),
+                        SizedBox(height: 5),
+                        Text("Vale de Consumo",
+                          style: TextStyle(fontSize: 18),
+                            textAlign: TextAlign.center
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  next(){
-    currentStep + 1 != steps.length
-      ?goTo(currentStep + 1)
-      :setState(()=> complete = true);
-  }
-
-  cancel(){
-    if(currentStep > 0){
-      goTo(currentStep -1);
-    }
-  }
-
-  goTo(int step){
-    setState(() => currentStep = step);
+  Future<void> _showMyDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (_) => FunkyOverlay(),
+    );
   }
   
+}
+
+class FunkyOverlay extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => FunkyOverlayState();
+}
+
+class FunkyOverlayState extends State<FunkyOverlay>
+    with SingleTickerProviderStateMixin {
+  AnimationController controller;
+  Animation<double> scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 450));
+    scaleAnimation =
+        CurvedAnimation(parent: controller, curve: Curves.elasticInOut);
+
+    controller.addListener(() {
+      setState(() {});
+    });
+
+    controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return _buildAlertDialog();
+  }
+
+  Widget _buildAlertDialog() {
+    return AlertDialog(
+      title: Text('Busqueda OT'),
+      content:
+        TextFormField(
+          keyboardType: TextInputType.number,
+          style: TextStyle(color: Colors.black, fontSize: 16.0),
+          decoration: const InputDecoration(
+            hintText: 'Ejemplo: 0098988212',
+            contentPadding: EdgeInsets.all(20.0),
+            isDense: true,
+          ),
+          validator: (value){
+            if(value.isEmpty){
+              return 'OT Inválida';
+            }
+            return null;
+          },
+        ),          
+      actions: <Widget>[
+        FlatButton(
+            child: Text("Aceptar"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+
+        FlatButton(
+            child: Text("Cancelar"),
+            textColor: Colors.red,
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+      ],
+    );
+  }
 }

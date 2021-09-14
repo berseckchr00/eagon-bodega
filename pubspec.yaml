@@ -23,17 +23,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  basic_utils: ^1.5.1
+  basic_utils: 
   shared_preferences: ^2.0.6
   fluttertoast: ^8.0.7
   cupertino_icons: ^1.0.2
   intl: ^0.17.0
   cool_alert: ^1.1.0
+  json_to_form: ^0.0.1
   http:
+  find_dropdown: ^1.0.0
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.9.1"
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -50,6 +58,7 @@ flutter:
   assets:
     - assets/images/
     - assets/data/menu.json
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

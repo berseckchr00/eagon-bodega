@@ -16,7 +16,7 @@ class DteModel {
     Data data;
 
     factory DteModel.fromJson(Map<String, dynamic> json) => DteModel(
-        data: (json["data"] != null || !json.isEmpty)?Data.fromJson(json["data"]):null,
+        data: (json != null)?Data.fromJson(json["data"]):null,
     );
 
     Map<String, dynamic> toJson() => {

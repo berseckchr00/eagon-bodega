@@ -479,6 +479,8 @@ class _HomePageState extends State<HomePage> {
       _boxes = _setBoxes(_dte.data.items);    
     }   
 
+    
+
     _toggleSubmitState();
     return _boxes;
   }
