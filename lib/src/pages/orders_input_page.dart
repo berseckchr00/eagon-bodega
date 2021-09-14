@@ -31,17 +31,19 @@ class _OrdersInputState extends State<OrdersInput> {
 
   @override
   void initState() {
-    setState(() {
+    ///setState(() {
       //_toggleSubmitState();
+      super.initState();
       getWareHouseList().then((value) => {
-        itemsWareHouse = value,
+        setState(() {
+          itemsWareHouse = value;
+        })
       });
       getEmployeeList().then((value) => {
-        employeeList = value
+        setState(() {
+          employeeList = value;
+        })
       });
-      //_toggleSubmitState();
-    });
-    super.initState();
   }
 
   @override
@@ -57,7 +59,8 @@ class _OrdersInputState extends State<OrdersInput> {
         // the App.build method, and use it to set our appbar title.
         title: new Text("Generación de Pedido"),
       ),
-      body: new SingleChildScrollView(
+      body: (itemsWareHouse.isEmpty)? const Center(child: const CircularProgressIndicator()):
+        new SingleChildScrollView(
         child: new Center(
           // Center is a layout widget. It takes a single child and positions it
           // in the middle of the parent.
