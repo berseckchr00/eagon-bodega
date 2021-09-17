@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:eagon_bodega/src/forms/orders_input_form.dart';
+import 'package:eagon_bodega/src/models/ccosto_model.dart';
 import 'package:eagon_bodega/src/models/employee_model.dart';
+import 'package:eagon_bodega/src/models/item_cost_model.dart';
+import 'package:eagon_bodega/src/models/machine_model.dart';
 import 'package:eagon_bodega/src/models/warehouse_model.dart';
-import 'package:eagon_bodega/src/providers/employee_provider.dart';
+import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +23,12 @@ class _OrdersInputState extends State<OrdersInput> {
 
   OrderInputForm orderInputField = new OrderInputForm();
   WareHouseProvider wareHouseProvider = new WareHouseProvider();
-  EmployeeProvider employeeProvider = new EmployeeProvider(); 
+  OutgoingProvider outgoingProvider = new OutgoingProvider(); 
   List<String> itemsWareHouse = new List<String>();
   List<EmployeeModel> employeeList = new List<EmployeeModel>();
+  List<CCostoModel> ccostList = new List<CCostoModel>();
+  List<MachineModel> machineList = new List<MachineModel>();
+  List<ItemCostModel> itemCostList = new List<ItemCostModel>();
 
   Map keyboardTypes = {
     "number": TextInputType.number,
@@ -78,6 +84,15 @@ class _OrdersInputState extends State<OrdersInput> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: createDropdownEmploye()),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: createDropdownMachine()),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: createDropdownCCost()),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: createDropdownItemCost()),
             new JsonSchema(
               decorations: decorations,
               //keyboardTypes: keyboardTypes,
@@ -87,7 +102,7 @@ class _OrdersInputState extends State<OrdersInput> {
                 this.response = response;
               },
               actionSave: (data) {
-
+                //TODO: Validar filterdropdown values
                 Navigator.pushNamed(context, "/orders_input_detail");
               },
               buttonSave: new Container(
@@ -119,7 +134,22 @@ class _OrdersInputState extends State<OrdersInput> {
   }
 
   Future<List<EmployeeModel>> getEmployeeList() async{
-    return await employeeProvider.getEmployeeList();
+    return await outgoingProvider.getEmployeeList();
+    //print(employeeList.toString());
+  }
+
+  Future<List<CCostoModel>> getCCostList(idDepartment) async{
+    return await outgoingProvider.getCCostList(idDepartment);
+    //print(employeeList.toString());
+  }
+
+  Future<List<MachineModel>> getMachineList(idDepartment) async{
+    return await outgoingProvider.getMachineList(idDepartment);
+    //print(employeeList.toString());
+  }
+
+  Future<List<ItemCostModel>> getItemCostList(idDepartment) async{
+    return await outgoingProvider.getItemCostList(idDepartment);
     //print(employeeList.toString());
   }
 
@@ -164,7 +194,24 @@ class _OrdersInputState extends State<OrdersInput> {
         color: Colors.red
       ),
       searchHint: "Selecciona un empleado",
-      onChanged: (EmployeeModel item) => print(item.employe),
+      onChanged: (EmployeeModel item) => {
+        print(item.idDepartment),
+        getCCostList(item.idDepartment).then((value) {
+          setState(() {
+            ccostList = value;
+          });
+        }),
+        getMachineList(item.idDepartment).then((value) {
+          setState(() {
+            machineList = value;
+          });
+        }),
+        getItemCostList(item.idDepartment).then((value) {
+          setState(() {
+            itemCostList = value;
+          });
+        })
+      },
       //selectedItem: "Busqueda de empleado",
       validate: (EmployeeModel item) {
         if (item == null)
@@ -176,10 +223,80 @@ class _OrdersInputState extends State<OrdersInput> {
   }
 
   Widget createDropdownCCost(){
-
+    return  FindDropdown<CCostoModel>(
+      items: ccostList,
+      label: "Centro de Costo",
+      searchBoxDecoration: InputDecoration(
+        labelText: "Centro de Costo",
+        prefixIcon: Icon(Icons.info_outline),
+        border: OutlineInputBorder()
+      ),
+      autofocus: true,
+      showSearchBox: true,
+      labelStyle: TextStyle(
+        color: Colors.red
+      ),
+      searchHint: "Selecciona un centro de costo",
+      onChanged: (CCostoModel item) => print(item.cCostoCode),
+      //selectedItem: "Busqueda de empleado",
+      validate: (CCostoModel item) {
+        if (item == null)
+          return "Campo Requerido";
+        else
+          return null; //return null to "no error"
+      },
+    );
   }
 
   Widget createDropdownItemCost(){
+    return  FindDropdown<ItemCostModel>(
+      items: itemCostList,
+      label: "Item Gasto",
+      searchBoxDecoration: InputDecoration(
+        labelText: "Item Gasto",
+        prefixIcon: Icon(Icons.info_outline),
+        border: OutlineInputBorder()
+      ),
+      autofocus: true,
+      showSearchBox: true,
+      labelStyle: TextStyle(
+        color: Colors.red
+      ),
+      searchHint: "Selecciona un Item de Gasto",
+      onChanged: (ItemCostModel item) => print(item.code),
+      //selectedItem: "Busqueda de empleado",
+      validate: (ItemCostModel item) {
+        if (item == null)
+          return "Campo Requerido";
+        else
+          return null; //return null to "no error"
+      },
+    );
+  }
 
+  Widget createDropdownMachine(){
+    return  FindDropdown<MachineModel>(
+      items: machineList,
+      label: "Maquina",
+      searchBoxDecoration: InputDecoration(
+        labelText: "Maquina",
+        prefixIcon: Icon(Icons.info_outline),
+        border: OutlineInputBorder()
+      ),
+      autofocus: true,
+      showSearchBox: true,
+      labelStyle: TextStyle(
+        color: Colors.red
+      ),
+      searchHint: "Selecciona una Maquina",
+      onChanged: (MachineModel item) => print(item.machine),
+      //selectedItem: "Busqueda de empleado",
+      validate: (MachineModel item) {
+        if (item == null)
+          return "Campo Requerido";
+        else
+          return null; //return null to "no error"
+      },
+    );
   }
 }

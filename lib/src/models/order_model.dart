@@ -59,18 +59,21 @@ class Detalle {
   String nombreProducto;
   String cantidad;
   String unidadMedida;
+  String ubicacion;
 
   Detalle(
       {this.codigoProducto,
       this.nombreProducto,
       this.cantidad,
-      this.unidadMedida});
+      this.unidadMedida,
+      this.ubicacion});
 
   Detalle.fromJson(Map<String, dynamic> json) {
     codigoProducto = json['codigo_producto'];
     nombreProducto = json['nombre_producto'];
     cantidad = json['cantidad'];
     unidadMedida = json['unidad_medida'];
+    ubicacion = json['ubicacion'];
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +82,7 @@ class Detalle {
     data['nombre_producto'] = this.nombreProducto;
     data['cantidad'] = this.cantidad;
     data['unidad_medida'] = this.unidadMedida;
+    data['ubicacion'] = this.ubicacion;
     return data;
   }
 }

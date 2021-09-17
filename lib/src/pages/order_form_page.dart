@@ -1,5 +1,6 @@
 
 import 'package:eagon_bodega/src/models/order_model.dart';
+import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,12 +8,12 @@ typedef OnDelete();
 
 class OrderForm extends StatefulWidget {
 
-  final Detalle detalle ;/*= Detalle.fromJson(jsonDecode("{\"detalle\":[{\"codigo_producto\":\"LM001\",\"nombre_producto\":\"List\u00f3n mediano 2' 5\/4\",\"cantidad\":\"10\",\"unidad_medida\":\"UN\"},{\"codigo_producto\":\"M09AG\",\"nombre_producto\":\"Lubricante tuercas M09AG\",\"cantidad\":\"250\",\"unidad_medida\":\"CC\"},{\"codigo_producto\":\"TC09502\",\"nombre_producto\":\"Tuerca conica 2' 5\/4\",\"cantidad\":\"500\",\"unidad_medida\":\"UN\"}]}"));*/
+  final ProductModel product ;
   final state = _OrderFormState();
   final OnDelete onDelete;
   final index;
 
-  OrderForm({Key key, this.detalle, this.index, this.onDelete}) : super(key: key);
+  OrderForm({Key key, this.product, this.index, this.onDelete}) : super(key: key);
   @override
   _OrderFormState createState() => state;
 
@@ -36,9 +37,24 @@ class _OrderFormState extends State<OrderForm> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               AppBar(
-                leading: Icon(Icons.arrow_forward_outlined),
+                leading: Padding(
+                  padding: EdgeInsets.all(5),
+                  child:
+                   Material(
+                      elevation: 5,
+                      borderRadius: BorderRadius.circular(100),
+                      color: Colors.grey,
+                      child: Center(
+                        child: 
+                          Text(widget.index.toString(),
+                          style: TextStyle(
+                            fontSize: 20
+                          ),
+                        )),
+                    ),
+                  ),
                 //elevation: 0,
-                title: Text(widget.detalle.nombreProducto),
+                title: Text(widget.product.glosa),
                 backgroundColor: Theme.of(context).accentColor,
                 centerTitle: true,
                 actions: <Widget>[
@@ -48,21 +64,49 @@ class _OrderFormState extends State<OrderForm> {
                   )
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 5, right: 5, top: 8),
-                child: TextFormField(
-                  initialValue: widget.detalle.codigoProducto,
-                  onSaved: (val) => widget.detalle.codigoProducto = val,
-                  validator: (val) =>
-                      val.length > 3 ? null : 'Código Inválido',
-                  decoration: InputDecoration(
-                    labelText: 'Código Producto',
-                    hintText: 'Ingresa el código del producto',
-                    icon: Icon(Icons.production_quantity_limits),
-                    isDense: true,
+              Row(
+                children: [
+                  Expanded(
+                    child:Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, top: 8),
+                      child: TextFormField(
+                        initialValue: widget.product.producto,
+                        onSaved: (val) => widget.product.producto = val,
+                        validator: (val) =>
+                            val.length > 3 ? null : 'Código Inválido',
+                        decoration: InputDecoration(
+                          labelText: 'Código Producto',
+                          hintText: 'Ingresa el código del producto',
+                          icon: Icon(Icons.production_quantity_limits),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                  Expanded(
+                    child: 
+                      Padding(
+                        padding: EdgeInsets.only(left: 5, right: 5, top: 8),
+                        child: 
+                        TextFormField(
+                          initialValue: widget.product.nombre,
+                          onSaved: (val) => widget.product.idUbicacion = val,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
+                          ],
+                          validator: (val) =>
+                              int.parse(val) < 1 ? null : 'Ubicación',
+                          decoration: InputDecoration(
+                            labelText: 'Ubicación',
+                            hintText: 'Ingresa una ubicación',
+                            icon: Icon(Icons.production_quantity_limits),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    )
+                ]),
               Row(
                 children: [
                   Expanded(
@@ -71,8 +115,8 @@ class _OrderFormState extends State<OrderForm> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
-                          initialValue: widget.detalle.cantidad,
-                          onSaved: (val) => widget.detalle.cantidad = val,
+                          initialValue: widget.product.cantidad,
+                          onSaved: (val) => widget.product.cantidad = val,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
@@ -94,8 +138,8 @@ class _OrderFormState extends State<OrderForm> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
-                          initialValue: widget.detalle.unidadMedida,
-                          onSaved: (val) => widget.detalle.unidadMedida = val,
+                          initialValue: widget.product.unidadMedida,
+                          onSaved: (val) => widget.product.unidadMedida = val,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,

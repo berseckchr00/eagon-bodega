@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:eagon_bodega/src/models/order_model.dart';
+import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/pages/order_form_page.dart';
 import 'package:eagon_bodega/src/providers/empty_state_provider.dart';
+import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:flutter/material.dart';
 
 class OrderCreatePage extends StatefulWidget {
@@ -15,6 +17,7 @@ class OrderCreatePage extends StatefulWidget {
 class _OrderCreatePageState extends State<OrderCreatePage> {
 
   final TextEditingController _searchProduct = new TextEditingController();
+  OutgoingProvider outgoingProvider = new OutgoingProvider();
   List<OrderForm> detalles = [];
   int _count = 0;
 
@@ -79,10 +82,10 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
   }
 
   ///on form user deleted
-  void onDelete(Detalle _detail) {
+  void onDelete(ProductModel _detail) {
     setState(() {
       var find = detalles.firstWhere(
-        (it) => it.detalle == _detail,
+        (it) => it.product == _detail,
         orElse: () => null,
       );
       if (find != null) detalles.removeAt(detalles.indexOf(find));
@@ -91,22 +94,38 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   ///on add form
   void onAddForm() {
-    setState(() {
+    print(_searchProduct.text);
+    getProduct(_searchProduct.text).then((value) {
+      setState(() {
+        _count++;
+        ProductModel _product = value;
+        detalles.add(
+          OrderForm(
+            product: _product,
+            index: _count,
+            onDelete: () => onDelete(_product),
+          )
+        );
+      });
+    });
+    /* setState(() {
       _count++;
       Detalle _detalle = Detalle.fromJson(jsonDecode("{\"codigo_producto\":\"LM001\",\"nombre_producto\":\"List\u00f3n mediano 2' 5\/4\",\"cantidad\":\"10\",\"unidad_medida\":\"UN\"}"));
       detalles.add(OrderForm(
-        detalle: _detalle,
+        product: _detalle,
         index: _count,
         onDelete: () => onDelete(_detalle),
       ));
-    });
+    }); */
   }
 
   _inputSearchField() {
     return Padding(
         padding: EdgeInsets.only(top: 5, bottom: 0, left: 0, right: 0),
+        
         child: TextFormField(
         controller: _searchProduct,
+        keyboardType: TextInputType.number,
         //style: TextStyle(color: Colors.white, fontSize: 20.0),
         decoration: InputDecoration(
           labelText: "Ingresa un producto",
@@ -129,5 +148,9 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         },
       )
     );
+  }
+
+  Future<ProductModel> getProduct(productCode){
+    return outgoingProvider.getProduct(productCode);
   }
 }

@@ -14,7 +14,7 @@ class EmployeeModel{
   EmployeeModel(this.department, this.employe, this.idDocAprove, this.idDepartment, this.idPersonal, this.priority, this.valid, this.dateCreated, this.userCreated, this.dateUpdate, this.userUpdate);
 
   @override
-  String toString() => this.employe;
+  String toString() => this.idDepartment+"_"+this.employe;
 
   EmployeeModel.fromJson(Map<String, dynamic> json) {
     

@@ -8,9 +8,7 @@ class OrderInputForm{
 
   String _fields = json.encode({
     'fields': [
-      {'key': 'maquina', 'type': 'Input', 'label': 'Maquina', 'required': false,'hiddenLabel': true},
-      {'key': 'centro_costo', 'type': 'Input', 'label': 'Centro de Costo', 'required': true,'hiddenLabel': true},
-      {'key': 'item_gasto', 'type': 'Input', 'label': 'Numero Item Gasto', 'required': true,'hiddenLabel': true}
+      
     ]
   });
 
@@ -22,7 +20,7 @@ class OrderInputForm{
       hintText: 'Bodega', 
       errorText: 'Selecciona una Bodega',
 
-    ), */
+    ), 
     'maquina': InputDecoration(
       labelText: "Maquina",
       prefixIcon: Icon(Icons.info_outline),
@@ -37,7 +35,7 @@ class OrderInputForm{
       labelText: "Item de Gasto",
       prefixIcon: Icon(Icons.info_outline),
       border: OutlineInputBorder()
-    )
+    )*/
   };
 
   String get fields => this._fields;
