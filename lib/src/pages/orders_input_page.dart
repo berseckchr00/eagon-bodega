@@ -5,7 +5,7 @@ import 'package:eagon_bodega/src/models/ccosto_model.dart';
 import 'package:eagon_bodega/src/models/employee_model.dart';
 import 'package:eagon_bodega/src/models/item_cost_model.dart';
 import 'package:eagon_bodega/src/models/machine_model.dart';
-import 'package:eagon_bodega/src/models/warehouse_model.dart';
+import 'package:eagon_bodega/src/models/warehouse_model.dart' as warehouse;
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:find_dropdown/find_dropdown.dart';
@@ -24,11 +24,13 @@ class _OrdersInputState extends State<OrdersInput> {
   OrderInputForm orderInputField = new OrderInputForm();
   WareHouseProvider wareHouseProvider = new WareHouseProvider();
   OutgoingProvider outgoingProvider = new OutgoingProvider(); 
-  List<String> itemsWareHouse = new List<String>();
+  List<warehouse.Data> itemsWareHouse = new List<warehouse.Data>();
   List<EmployeeModel> employeeList = new List<EmployeeModel>();
   List<CCostoModel> ccostList = new List<CCostoModel>();
   List<MachineModel> machineList = new List<MachineModel>();
   List<ItemCostModel> itemCostList = new List<ItemCostModel>();
+
+  Map<String, dynamic> itemForm = new Map<String, dynamic>();
 
   Map keyboardTypes = {
     "number": TextInputType.number,
@@ -98,12 +100,11 @@ class _OrdersInputState extends State<OrdersInput> {
               //keyboardTypes: keyboardTypes,
               form: form,
               onChanged: (dynamic response) {
-                print(jsonEncode(response));
                 this.response = response;
               },
               actionSave: (data) {
                 //TODO: Validar filterdropdown values
-                Navigator.pushNamed(context, "/orders_input_detail");
+                Navigator.pushNamed(context, "/orders_input_detail", arguments: itemForm);
               },
               buttonSave: new Container(
                 height: 40.0,
@@ -121,16 +122,14 @@ class _OrdersInputState extends State<OrdersInput> {
     );
   }
 
-  Future<List<String>> getWareHouseList() async {    
-    WareHouseModel wareHouse = await wareHouseProvider.getWareHouseList();
+  Future<List<warehouse.Data>> getWareHouseList() async {    
+    warehouse.WareHouseModel wareHouse = await wareHouseProvider.getWareHouseList();
     
-    List<String> items = new List<String>();
+    /* List<String> items = new List<String>();
     wareHouse.data.forEach((element) {
       items.add(element.nombre);
-    });
-    
-    print(items);
-    return items;
+    }); */
+    return wareHouse.data;
   }
 
   Future<List<EmployeeModel>> getEmployeeList() async{
@@ -154,7 +153,7 @@ class _OrdersInputState extends State<OrdersInput> {
   }
 
   Widget createDropdownWareHouse(){
-    return  FindDropdown(
+    return  FindDropdown<warehouse.Data>(
       items: itemsWareHouse,
       label: "Bodega",
       searchBoxDecoration: InputDecoration(
@@ -168,9 +167,12 @@ class _OrdersInputState extends State<OrdersInput> {
         color: Colors.red
       ),
       searchHint: "Selecciona una Bodega",
-      onChanged: (String item) => print(item),
-      selectedItem: "Busqueda de Bodega",
-      validate: (String item) {
+      onChanged: (warehouse.Data item) {
+        itemForm.remove('ID_BODEGA');
+        var it = {'ID_BODEGA':item.idBodega};
+        itemForm.addAll(it);
+      },
+      validate: (warehouse.Data item) {
         if (item == null)
           return "Campo Requerido";
         else
@@ -195,7 +197,8 @@ class _OrdersInputState extends State<OrdersInput> {
       ),
       searchHint: "Selecciona un empleado",
       onChanged: (EmployeeModel item) => {
-        print(item.idDepartment),
+        itemForm.remove('ID_EMPLEADO'),
+        itemForm.addAll({'ID_EMPLEADO':item.idPersonal}),
         getCCostList(item.idDepartment).then((value) {
           setState(() {
             ccostList = value;
@@ -237,7 +240,10 @@ class _OrdersInputState extends State<OrdersInput> {
         color: Colors.red
       ),
       searchHint: "Selecciona un centro de costo",
-      onChanged: (CCostoModel item) => print(item.cCostoCode),
+      onChanged: (CCostoModel item) {
+        itemForm.remove('ID_CENTRO_COSTO');
+        itemForm.addAll({'ID_CENTRO_COSTO':item.cCostoCode});
+      },
       //selectedItem: "Busqueda de empleado",
       validate: (CCostoModel item) {
         if (item == null)
@@ -263,7 +269,10 @@ class _OrdersInputState extends State<OrdersInput> {
         color: Colors.red
       ),
       searchHint: "Selecciona un Item de Gasto",
-      onChanged: (ItemCostModel item) => print(item.code),
+      onChanged: (ItemCostModel item) {        
+        itemForm.remove('ID_ITEM_GASTO');
+        itemForm.addAll({'ID_ITEM_GASTO':item.code});
+      },
       //selectedItem: "Busqueda de empleado",
       validate: (ItemCostModel item) {
         if (item == null)
@@ -289,7 +298,10 @@ class _OrdersInputState extends State<OrdersInput> {
         color: Colors.red
       ),
       searchHint: "Selecciona una Maquina",
-      onChanged: (MachineModel item) => print(item.machine),
+      onChanged: (MachineModel item) {
+        itemForm.remove('ID_MAQUINA');
+        itemForm.addAll({'ID_MAQUINA':item.idMachine});
+      },
       //selectedItem: "Busqueda de empleado",
       validate: (MachineModel item) {
         if (item == null)

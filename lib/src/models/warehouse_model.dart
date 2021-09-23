@@ -33,6 +33,9 @@ class Data {
   Null ctaCorrienteFlex;
   Null razonSocialFlex;
 
+  @override
+  String toString() => this.nombre;
+  
   Data(
       {this.idBodega,
       this.nombre,

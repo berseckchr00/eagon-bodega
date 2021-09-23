@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:eagon_bodega/src/models/order_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/pages/order_form_page.dart';
 import 'package:eagon_bodega/src/providers/empty_state_provider.dart';
@@ -20,9 +18,14 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
   OutgoingProvider outgoingProvider = new OutgoingProvider();
   List<OrderForm> detalles = [];
   int _count = 0;
+  Map<String, dynamic> saveData = new Map<String, dynamic>();
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context).settings.arguments;
+    
+    saveData.addAll({'head':args});
+
     return Scaffold(
       appBar: AppBar(
         elevation: .0,
@@ -32,7 +35,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
             child: Text('Guardar'),
             textColor: Colors.white,
             onPressed: (){
-
+              _saveOrder();
             },
           )
         ],
@@ -94,7 +97,6 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   ///on add form
   void onAddForm() {
-    print(_searchProduct.text);
     getProduct(_searchProduct.text).then((value) {
       setState(() {
         _count++;
@@ -152,5 +154,22 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   Future<ProductModel> getProduct(productCode){
     return outgoingProvider.getProduct(productCode);
+  }
+
+  Future<Map<String,dynamic>> _saveOrder() async {
+    
+    var arr = [];
+    detalles.forEach((element) {
+      arr.add({
+        "CODIGO_PRODUCTO" : element.product.producto,
+        "ID_UBICACION" : element.product.idUbicacion,
+        "CANTIDAD" : element.state.cantidadEditor.text,
+        "UNIDAD_MEDIDA" : element.state.unidadMedidaEditor.text
+      });
+    });
+
+    saveData.addAll({'detail':arr});
+    return await outgoingProvider.saveOrder(saveData);
+    
   }
 }

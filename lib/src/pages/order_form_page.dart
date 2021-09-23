@@ -1,5 +1,4 @@
 
-import 'package:eagon_bodega/src/models/order_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,9 +21,13 @@ class OrderForm extends StatefulWidget {
 
 class _OrderFormState extends State<OrderForm> {
   final form = GlobalKey<FormState>();
+  TextEditingController cantidadEditor ;
+  TextEditingController unidadMedidaEditor;
 
   @override
   Widget build(BuildContext context) {
+    cantidadEditor = new TextEditingController(text: widget.product.cantidad);
+    unidadMedidaEditor = new TextEditingController(text: widget.product.unidadMedida);
     return Padding(
       padding: EdgeInsets.only(top: 5, bottom: 0, left: 10, right: 10),
       child: Material(
@@ -115,8 +118,9 @@ class _OrderFormState extends State<OrderForm> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
-                          initialValue: widget.product.cantidad,
-                          onSaved: (val) => widget.product.cantidad = val,
+                          //initialValue: widget.product.cantidad,
+                          controller:  cantidadEditor,
+                          onSaved: (val) => cantidadEditor.text = val,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
@@ -138,8 +142,9 @@ class _OrderFormState extends State<OrderForm> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
-                          initialValue: widget.product.unidadMedida,
-                          onSaved: (val) => widget.product.unidadMedida = val,
+                          //initialValue: widget.product.unidadMedida,
+                          controller: unidadMedidaEditor,
+                          onSaved: (val) => unidadMedidaEditor.text = val,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
