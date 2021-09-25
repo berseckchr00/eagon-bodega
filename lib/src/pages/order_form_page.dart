@@ -145,10 +145,9 @@ class _OrderFormState extends State<OrderForm> {
                           //initialValue: widget.product.unidadMedida,
                           controller: unidadMedidaEditor,
                           onSaved: (val) => unidadMedidaEditor.text = val,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
+                          /* inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
-                          ],
+                          ], */
                           validator: (val) =>
                               int.parse(val) < 1 ? null : 'Unidad Medida Inválida',
                           decoration: InputDecoration(

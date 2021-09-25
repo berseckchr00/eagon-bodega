@@ -19,6 +19,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
   List<OrderForm> detalles = [];
   int _count = 0;
   Map<String, dynamic> saveData = new Map<String, dynamic>();
+  bool _enableButtonSave = true;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +35,17 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
           FlatButton(
             child: Text('Guardar'),
             textColor: Colors.white,
-            onPressed: (){
+            onPressed: (!_enableButtonSave)?null:(){
+              setState(() {
+                _enableButtonSave = false;
+              });
               _saveOrder();
             },
           )
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        /* decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color(0xFF30C1FF),
@@ -50,7 +54,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-        ),
+        ), */
         child: 
           Column(
             children: [
@@ -97,6 +101,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   ///on add form
   void onAddForm() {
+    print(_searchProduct.text);
     getProduct(_searchProduct.text).then((value) {
       setState(() {
         _count++;
@@ -130,7 +135,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         keyboardType: TextInputType.number,
         //style: TextStyle(color: Colors.white, fontSize: 20.0),
         decoration: InputDecoration(
-          labelText: "Ingresa un producto",
+          labelText: "Escanea una ubicación",
           border: OutlineInputBorder(),
           focusColor: Colors.grey.shade100,
           fillColor: Colors.grey.shade300
