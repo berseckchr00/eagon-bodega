@@ -6,6 +6,7 @@ import 'package:eagon_bodega/src/models/employee_model.dart';
 import 'package:eagon_bodega/src/models/item_cost_model.dart';
 import 'package:eagon_bodega/src/models/machine_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
+import 'package:eagon_bodega/src/models/response_order_model.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -151,7 +152,7 @@ class OutgoingProvider{
     }
   }
 
-  Future<Map<String,dynamic>> saveOrder(Map<String,dynamic> jsonData) async{
+  Future<ResponseOrderModel> saveOrder(Map<String,dynamic> jsonData) async{
     
     var uri = Uri.parse('$_url/outgoing.php/saveOrder');
     Map<String, String> headers = {
@@ -170,7 +171,9 @@ class OutgoingProvider{
       data = Utf8Codec().decode(resp.bodyBytes);
 
       print(data);
-      return jsonDecode(data);
+
+      ResponseOrderModel response = ResponseOrderModel.fromJson(jsonDecode(data));
+      return response;
       //return warehouse;
       //List<Dte> lstDte = new 
 

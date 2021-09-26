@@ -10,6 +10,7 @@ import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:json_to_form/json_schema.dart';
 
 class OrdersInput extends StatefulWidget {
@@ -82,40 +83,47 @@ class _OrdersInputState extends State<OrdersInput> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: createDropdownWareHouse()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: createDropdownEmploye()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: createDropdownMachine()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: createDropdownCCost()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: createDropdownItemCost()),
-            new JsonSchema(
-              decorations: decorations,
-              //keyboardTypes: keyboardTypes,
-              form: form,
-              onChanged: (dynamic response) {
-                this.response = response;
-              },
-              actionSave: (data) {
-                //TODO: Validar filterdropdown values
-                Navigator.pushNamed(context, "/orders_input_detail", arguments: itemForm);
-              },
-              buttonSave: new Container(
-                height: 40.0,
-                color: Colors.blueAccent,
-                child: Center(
-                  child: Text("Ingresar Detalle",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
+              child: _loadComponent('warehause')
             ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: _loadComponent('employee')
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: _loadComponent('machine')
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: _loadComponent('ccost')
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: _loadComponent('itemcost')
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                //primary: Colors.orange
+              ),
+              onPressed: (){
+                if(!_validateForm()){
+                  Fluttertoast.showToast(
+                    msg: "Faltan elementos por cargar",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                  );
+                }else{
+                  Navigator.pushNamed(context, "/orders_input_detail", arguments: itemForm);
+                }
+              },
+              child: Text('Ingresar Detalle',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  )
+              ),
           ]),
         ),
       ),
@@ -173,9 +181,19 @@ class _OrdersInputState extends State<OrdersInput> {
         itemForm.addAll(it);
       },
       validate: (warehouse.Data item) {
-        if (item == null)
-          return "Campo Requerido";
-        else
+        if (item == null){
+           
+            Fluttertoast.showToast(
+              msg: "No se pudo cargar listado de bodegas",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+            );
+             return null;
+        }else
           return null; //return null to "no error"
       },
     );
@@ -275,10 +293,20 @@ class _OrdersInputState extends State<OrdersInput> {
       },
       //selectedItem: "Busqueda de empleado",
       validate: (ItemCostModel item) {
-        if (item == null)
-          return "Campo Requerido";
-        else
-          return null; //return null to "no error"
+        if (item == null){
+           
+            Fluttertoast.showToast(
+              msg: "No se pudo cargar listado de bodegas",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+            );
+             return null;
+        }else
+          return null;  //return null to "no error"
       },
     );
   }
@@ -310,5 +338,70 @@ class _OrdersInputState extends State<OrdersInput> {
           return null; //return null to "no error"
       },
     );
+  }
+
+  _loadComponent(String s) {
+    
+    switch (s) {
+      case 'warehause':
+        {
+          if (itemsWareHouse != null){
+            return (itemsWareHouse.isNotEmpty)?createDropdownWareHouse(): Container()
+                /* const Center(child: const CircularProgressIndicator()) */;
+          }
+        break;
+        }
+      case 'employee':
+      {
+        if (employeeList != null){
+          return (employeeList.isNotEmpty)?createDropdownEmploye(): Container()
+                /* const Center(child: const CircularProgressIndicator() )*/;
+        }
+        break;
+      } 
+      case 'machine':{
+        if (machineList != null){
+           return (machineList.isNotEmpty)? createDropdownMachine(): Container()
+                /* const Center(child: const CircularProgressIndicator()) */;
+        }
+        break;
+      }
+      case 'ccost':{
+        if (ccostList != null){
+          return (ccostList.isNotEmpty)?createDropdownCCost(): Container() 
+                /* const Center(child: const CircularProgressIndicator()) */;
+        }
+        break;
+      }
+      case 'itemcost':{
+        if (itemCostList != null){
+          return (itemCostList.isNotEmpty)? createDropdownItemCost(): Container()
+                /* const Center(child: const CircularProgressIndicator()) */;
+        }
+        break;
+      }
+
+    }
+  }
+
+  _validateForm() {
+
+    if (!itemForm.containsKey('ID_BODEGA')){
+      return false;
+    }
+    if (!itemForm.containsKey('ID_EMPLEADO')){
+      return false;
+    }
+    if (!itemForm.containsKey('ID_MAQUINA')){
+      return false;
+    }
+    if (!itemForm.containsKey('ID_ITEM_GASTO')){
+      return false;
+    }
+    if (!itemForm.containsKey('ID_CENTRO_COSTO')){
+      return false;
+    }
+
+    return true;
   }
 }

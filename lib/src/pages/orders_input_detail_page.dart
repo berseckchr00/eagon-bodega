@@ -1,8 +1,10 @@
 
 import 'package:eagon_bodega/src/models/product_model.dart';
+import 'package:eagon_bodega/src/models/response_order_model.dart';
 import 'package:eagon_bodega/src/pages/order_form_page.dart';
 import 'package:eagon_bodega/src/providers/empty_state_provider.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
+import 'package:eagon_bodega/src/utils/alert.dart';
 import 'package:flutter/material.dart';
 
 class OrderCreatePage extends StatefulWidget {
@@ -27,7 +29,8 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
     
     saveData.addAll({'head':args});
 
-    return Scaffold(
+    return 
+     Scaffold(
       appBar: AppBar(
         elevation: .0,
         title: Text("Ingreso detalle"),//_inputSearchField(),
@@ -39,22 +42,45 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
               setState(() {
                 _enableButtonSave = false;
               });
-              _saveOrder();
+              _saveOrder().then((value){
+                if (value.success){
+                  var baseDialog = BaseAlertDialog(
+                  title: "Confirmación",
+                  content: value.msg + ' \nNumero Orden:'+ value.lastId.toString(),
+                  yesOnPressed: () {
+                    Navigator.pushNamed(context, '/orders');
+                  },
+                  noOnPressed: () {
+                    Navigator.pushNamed(context, "/orders_input");
+                  },
+                  color: Colors.green.shade100,
+                  yes: "OK",
+                  no: "Nuevo");
+
+                  showDialog(context: context, builder: (BuildContext context) => baseDialog);
+                }else{
+                  var baseDialog = BaseAlertDialog(
+                  title: "Error",
+                  content: value.msg,
+                  yesOnPressed: () {
+                    Navigator.of(context, rootNavigator: true)
+                    .pop();
+
+                    setState(() {
+                      _enableButtonSave = false;
+                    });
+                  },
+                  color: Colors.red.shade100,
+                  yes: "OK");
+
+                  showDialog(context: context, builder: (BuildContext context) => baseDialog);
+                }
+              });
             },
           )
         ],
       ),
       body: Container(
-        /* decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF30C1FF),
-              Color(0xFF2AA7DC),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ), */
         child: 
           Column(
             children: [
@@ -80,11 +106,6 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
             ],
           ),
       ),
-      /* floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: onAddForm,
-        foregroundColor: Colors.white,
-      ), */
     );
   }
 
@@ -115,15 +136,6 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         );
       });
     });
-    /* setState(() {
-      _count++;
-      Detalle _detalle = Detalle.fromJson(jsonDecode("{\"codigo_producto\":\"LM001\",\"nombre_producto\":\"List\u00f3n mediano 2' 5\/4\",\"cantidad\":\"10\",\"unidad_medida\":\"UN\"}"));
-      detalles.add(OrderForm(
-        product: _detalle,
-        index: _count,
-        onDelete: () => onDelete(_detalle),
-      ));
-    }); */
   }
 
   _inputSearchField() {
@@ -161,7 +173,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
     return outgoingProvider.getProduct(productCode);
   }
 
-  Future<Map<String,dynamic>> _saveOrder() async {
+  Future<ResponseOrderModel> _saveOrder() async {
     
     var arr = [];
     detalles.forEach((element) {
@@ -174,7 +186,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
     });
 
     saveData.addAll({'detail':arr});
-    return await outgoingProvider.saveOrder(saveData);
-    
+    ResponseOrderModel response = await outgoingProvider.saveOrder(saveData);
+    return response;
   }
 }

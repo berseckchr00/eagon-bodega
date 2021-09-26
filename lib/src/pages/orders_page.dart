@@ -13,6 +13,7 @@ class _OrdersPageState extends State<OrdersPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         title: Text("Pedidos",
             style: TextStyle(fontSize: 18)
           ),
