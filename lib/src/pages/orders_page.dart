@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class OrdersPage extends StatefulWidget{
   
@@ -148,6 +149,15 @@ class FunkyOverlayState extends State<FunkyOverlay>
             child: Text("Aceptar"),
             textColor: Colors.blue,
             onPressed: () {
+               Fluttertoast.showToast(
+                msg: "Aún sin implementar",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0
+              );
               Navigator.of(context).pop();
             }),
 
