@@ -182,4 +182,31 @@ class OutgoingProvider{
     }
   }
 
+  Future<Map<String,dynamic>> getOtData(String otNumber) async{
+    
+    var uri = Uri.parse('$_url/outgoing.php/getOtData');
+    Map<String, String> headers = {
+      "content-type"  : "application/x-www-form-urlencoded",
+      'Authorization' : EnviromentConfig().getApiKey(),
+      'ci_session'    : prefs.ciSession
+    };
+
+    Map<String, String> queryParameters = {
+      "otNumber": otNumber
+    };
+    var data;
+    try{
+      
+      final resp = await http.post( uri, body: queryParameters,  headers: headers);
+      data = Utf8Codec().decode(resp.bodyBytes);
+
+      print(data);
+
+      return jsonDecode(data); 
+
+    }catch(ex){
+      return null;
+    }
+  }
+
 }

@@ -1,20 +1,22 @@
 
+import 'dart:convert';
+
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/models/response_order_model.dart';
-import 'package:eagon_bodega/src/pages/order_form_page.dart';
+import 'package:eagon_bodega/src/pages/orders/order_form_page.dart';
 import 'package:eagon_bodega/src/providers/empty_state_provider.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/utils/alert.dart';
 import 'package:flutter/material.dart';
 
-class OrderCreatePage extends StatefulWidget {
-  OrderCreatePage({Key key}) : super(key: key);
+class OrderCreatePageOt extends StatefulWidget {
+  OrderCreatePageOt({Key key}) : super(key: key);
 
   @override
-  _OrderCreatePageState createState() => _OrderCreatePageState();
+  _OrderCreatePageOtState createState() => _OrderCreatePageOtState();
 }
 
-class _OrderCreatePageState extends State<OrderCreatePage> {
+class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
 
   final TextEditingController _searchProduct = new TextEditingController();
   OutgoingProvider outgoingProvider = new OutgoingProvider();
@@ -23,11 +25,14 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
   Map<String, dynamic> saveData = new Map<String, dynamic>();
   bool _enableButtonSave = true;
 
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments;
     
-    saveData.addAll({'head':args});
+    saveData.addAll({'data':args});
+
+    _loadDetail(args);
 
     return 
      Scaffold(
@@ -84,11 +89,11 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         child: 
           Column(
             children: [
-              Padding(
+              /* Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child:
                   _inputSearchField(),
-              ),
+              ), */
               detalles.length <= 0
                 ? Center(
                     child: EmptyState(
@@ -122,7 +127,6 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   ///on add form
   void onAddForm() {
-    print(_searchProduct.text);
     getProduct(_searchProduct.text).then((value) {
       setState(() {
         _count++;
@@ -136,37 +140,6 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         );
       });
     });
-  }
-
-  _inputSearchField() {
-    return Padding(
-        padding: EdgeInsets.only(top: 5, bottom: 0, left: 0, right: 0),
-        
-        child: TextFormField(
-        controller: _searchProduct,
-        keyboardType: TextInputType.number,
-        //style: TextStyle(color: Colors.white, fontSize: 20.0),
-        decoration: InputDecoration(
-          labelText: "Escanea una ubicación",
-          border: OutlineInputBorder(),
-          focusColor: Colors.grey.shade100,
-          fillColor: Colors.grey.shade300
-
-        ),
-        validator: (value){
-          if(value.isEmpty){
-            return 'Valor inválido';
-          }
-          return null;
-        },
-        onFieldSubmitted: (String value){
-          setState(() {
-            (value.length > 0)? onAddForm(): print("invalid value");
-          });
-          _searchProduct.clear();
-        },
-      )
-    );
   }
 
   Future<ProductModel> getProduct(productCode){
@@ -188,5 +161,23 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
     saveData.addAll({'detail':arr});
     ResponseOrderModel response = await outgoingProvider.saveOrder(saveData);
     return response;
+  }
+
+  void _loadDetail(String args) {
+
+    var jsonData = jsonDecode(args);
+
+    jsonData['detail'].forEach((key, value) { 
+      _count++;
+        ProductModel _product = value;
+        detalles.add(
+          OrderForm(
+            product: _product,
+            index: _count,
+            onDelete: () => onDelete(_product),
+          )
+        );
+    });
+
   }
 }
