@@ -217,9 +217,11 @@ class _OrdersInputState extends State<OrdersInput> {
       onChanged: (EmployeeModel item) => {
         itemForm.remove('ID_EMPLEADO'),
         itemForm.addAll({'ID_EMPLEADO':item.idPersonal}),
+        print(itemForm),
         getCCostList(item.idDepartment).then((value) {
           setState(() {
             ccostList = value;
+            /* print(itemForm); */
           });
         }),
         getMachineList(item.idDepartment).then((value) {

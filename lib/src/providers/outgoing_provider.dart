@@ -88,7 +88,7 @@ class OutgoingProvider{
       //List<Post> posts = List<Post>.from(l.map((model)=> Post.fromJson(model)));
 
       List<MachineModel> machineList = List<MachineModel>.from(it.map((model) => MachineModel.fromJson(model)));
-
+      //TODO: agregar machine por default
       return machineList;
       //return warehouse;
       //List<Dte> lstDte = new 

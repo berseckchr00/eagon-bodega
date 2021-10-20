@@ -149,8 +149,8 @@ class FunkyOverlayState extends State<FunkyOverlay>
             child: Text("Aceptar"),
             textColor: Colors.blue,
             onPressed: () {
-               /* Fluttertoast.showToast(
-                msg: "Aún sin implementar",
+               Fluttertoast.showToast(
+                msg: "Módulo aún sin implementar",
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.CENTER,
                 timeInSecForIosWeb: 1,
@@ -158,8 +158,8 @@ class FunkyOverlayState extends State<FunkyOverlay>
                 textColor: Colors.white,
                 fontSize: 16.0
               );
-              Navigator.of(context).pop(); */
-              Navigator.pushNamed(context, '/orders_input_ot');
+              Navigator.of(context).pop();
+              //Navigator.pushNamed(context, '/orders_input_ot');
             }),
 
         FlatButton(

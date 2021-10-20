@@ -40,7 +40,8 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
             textColor: Colors.white,
             onPressed: (!_enableButtonSave)?null:(){
               setState(() {
-                _enableButtonSave = false;
+                //_enableButtonSave = false;
+                _enableButtonSave = true;
               });
               _saveOrder().then((value){
                 if (value.success){
@@ -144,7 +145,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         
         child: TextFormField(
         controller: _searchProduct,
-        keyboardType: TextInputType.number,
+        //keyboardType: TextInputType.number,
         //style: TextStyle(color: Colors.white, fontSize: 20.0),
         decoration: InputDecoration(
           labelText: "Escanea una ubicación",
