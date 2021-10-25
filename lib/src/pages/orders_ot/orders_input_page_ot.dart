@@ -1,17 +1,9 @@
-import 'dart:convert';
 
 import 'package:eagon_bodega/src/forms/orders_input_form.dart';
-import 'package:eagon_bodega/src/models/ccosto_model.dart';
-import 'package:eagon_bodega/src/models/employee_model.dart';
-import 'package:eagon_bodega/src/models/item_cost_model.dart';
-import 'package:eagon_bodega/src/models/machine_model.dart';
-import 'package:eagon_bodega/src/models/warehouse_model.dart' as warehouse;
+import 'package:eagon_bodega/src/models/order_model.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
-import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:json_to_form/json_schema.dart';
 
 class OrdersInputOt extends StatefulWidget {
   OrdersInputOt({Key key}) : super(key: key);
@@ -25,14 +17,15 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
   OrderInputForm orderInputField = new OrderInputForm();
   WareHouseProvider wareHouseProvider = new WareHouseProvider();
   OutgoingProvider outgoingProvider = new OutgoingProvider(); 
-  Map<String,dynamic> responseOt = new Map<String,dynamic>();
-  List<warehouse.Data> itemsWareHouse = new List<warehouse.Data>();
-  List<EmployeeModel> employeeList = new List<EmployeeModel>();
-  List<CCostoModel> ccostList = new List<CCostoModel>();
-  List<MachineModel> machineList = new List<MachineModel>();
-  List<ItemCostModel> itemCostList = new List<ItemCostModel>();
+  OrdersModel responseOt = new OrdersModel();
+  final TextEditingController _ctrlWarehouse = new TextEditingController();
+  final TextEditingController _ctrlEmployee = new TextEditingController();
+  final TextEditingController _ctrlMachine = new TextEditingController();
+  final TextEditingController _ctrlCcost = new TextEditingController();
+  final TextEditingController _ctrlItemCost = new TextEditingController();
 
   Map<String, dynamic> itemForm = new Map<String, dynamic>();
+  var args;
 
   Map keyboardTypes = {
     "number": TextInputType.number,
@@ -41,40 +34,35 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
 
   @override
   void initState() {
-    ///setState(() {
-      //_toggleSubmitState();
-      super.initState();/* 
-      getOtData().then((value) => {
+    Future.delayed(Duration.zero, () {
+      
+      args = ModalRoute.of(context).settings.arguments;
+      getOtData(args).then((value) => {
         setState(() {
           responseOt = value;
+          _ctrlWarehouse.text = responseOt.bodega;
+          _ctrlEmployee.text = responseOt.nombreSolicitante;
+          _ctrlMachine.text = responseOt.maquina;
+          _ctrlCcost.text = responseOt.centroCosto;
+          _ctrlItemCost.text = responseOt.itemGasto;
         })
-      }); */
-      /* 
-      getEmployeeList().then((value) => {
-        setState(() {
-          employeeList = value;
-        })
-      }); */
+      });
+    });
+    
+    super.initState();
+    
   }
 
   @override
   Widget build(BuildContext context) {
 
-    final args = ModalRoute.of(context).settings.arguments;
-
-    getOtData(args).then((value) => {
-        setState(() {
-          responseOt = value;
-        })
-    });
-
-    return new Scaffold(
+    return (responseOt == null)? const Center(child: const CircularProgressIndicator()): new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: new Text("Generación de Pedido"),
       ),
-      body: (itemsWareHouse.isEmpty)? const Center(child: const CircularProgressIndicator()):
+      body: 
         new SingleChildScrollView(
         child: new Center(
           // Center is a layout widget. It takes a single child and positions it
@@ -89,23 +77,23 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField(itemsWareHouse[0].nombre, "Bodega")
+              child: _createTextFormField((responseOt != null)?responseOt.bodega:'', "Bodega", _ctrlWarehouse)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField(employeeList[0].employe, "Empleado")
+              child: _createTextFormField((responseOt != null)?responseOt.nombreSolicitante:'', "Empleado", _ctrlEmployee)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField(machineList[0].machine, "Maquina")
+              child: _createTextFormField((responseOt != null)?responseOt.maquina:'', "Maquina", _ctrlMachine)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField(ccostList[0].cCostoCode, "Centro Costo")
+              child: _createTextFormField((responseOt != null)?responseOt.centroCosto:'', "Centro Costo", _ctrlCcost)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField(itemCostList[0].description, "Item de Gasto")
+              child: _createTextFormField((responseOt != null)?responseOt.itemGasto:'', "Item de Gasto", _ctrlItemCost)
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -124,13 +112,14 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
     );
   }
 
-  Future<Map<String,dynamic>> getOtData(String otNumber) async {    
-    Map<String,dynamic> response = await outgoingProvider.getOtData(otNumber);
+  Future<OrdersModel> getOtData(String otNumber) async {    
+    OrdersModel response = await outgoingProvider.getOtData(otNumber);
+    print(otNumber);
     return response;
   }
 
-  Widget _createTextFormField(String text, String label) {
-   return TextFormField(
+  Widget _createTextFormField(String text, String label, TextEditingController controller) {
+    return TextFormField(
   // The validator receives the text that the user has entered.
     decoration: InputDecoration(
       labelText: label,
@@ -141,7 +130,8 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
           color: Colors.orange.shade900
         ), 
     ),
-    initialValue: text,
+    //initialValue: text,
+    controller: controller,
     enabled: false,
     validator: (value) {
       if (value == null || value.isEmpty) {

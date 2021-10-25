@@ -5,6 +5,7 @@ import 'package:eagon_bodega/src/models/ccosto_model.dart';
 import 'package:eagon_bodega/src/models/employee_model.dart';
 import 'package:eagon_bodega/src/models/item_cost_model.dart';
 import 'package:eagon_bodega/src/models/machine_model.dart';
+import 'package:eagon_bodega/src/models/order_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/models/response_order_model.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
@@ -182,27 +183,25 @@ class OutgoingProvider{
     }
   }
 
-  Future<Map<String,dynamic>> getOtData(String otNumber) async{
+  Future<OrdersModel> getOtData(String otNumber) async{
     
-    var uri = Uri.parse('$_url/outgoing.php/getOtData');
+    var uri = Uri.parse('$_url/outgoing.php/getOtData/$otNumber');
     Map<String, String> headers = {
       "content-type"  : "application/x-www-form-urlencoded",
       'Authorization' : EnviromentConfig().getApiKey(),
       'ci_session'    : prefs.ciSession
     };
 
-    Map<String, String> queryParameters = {
-      "otNumber": otNumber
-    };
     var data;
     try{
       
-      final resp = await http.post( uri, body: queryParameters,  headers: headers);
+      final resp = await http.get( uri, headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
 
-      print(data);
+      print(uri);
 
-      return jsonDecode(data); 
+      OrdersModel order = OrdersModel.fromJson(jsonDecode(data));
+      return order; 
 
     }catch(ex){
       return null;

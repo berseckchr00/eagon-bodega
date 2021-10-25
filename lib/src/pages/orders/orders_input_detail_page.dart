@@ -123,18 +123,43 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
 
   ///on add form
   void onAddForm() {
-    print(_searchProduct.text);
     getProduct(_searchProduct.text).then((value) {
       setState(() {
-        _count++;
-        ProductModel _product = value;
-        detalles.add(
-          OrderForm(
-            product: _product,
-            index: _count,
-            onDelete: () => onDelete(_product),
-          )
-        );
+        if(value.glosa != null){
+          _count++;
+          ProductModel _product = value;
+          detalles.add(
+            OrderForm(
+              product: _product,
+              index: _count,
+              onDelete: () => onDelete(_product),
+            )
+          );
+        }else{
+          var baseDialog = BaseAlertDialog(
+                  title: "Error",
+                  content: "Error al leer Ubicación",
+                  noOnPressed:(){
+                    Navigator.of(context, rootNavigator: true)
+                    .pop();
+
+                    setState(() {
+                      _enableButtonSave = false;
+                    });
+                  },
+                  yesOnPressed: () {
+                    Navigator.of(context, rootNavigator: true)
+                    .pop();
+
+                    setState(() {
+                      _enableButtonSave = false;
+                    });
+                  },
+                  color: Colors.red.shade100,
+                  yes: "OK");
+
+                  showDialog(context: context, builder: (BuildContext context) => baseDialog);
+        }
       });
     });
   }
@@ -144,6 +169,7 @@ class _OrderCreatePageState extends State<OrderCreatePage> {
         padding: EdgeInsets.only(top: 5, bottom: 0, left: 0, right: 0),
         
         child: TextFormField(
+        autofocus: true,
         controller: _searchProduct,
         //keyboardType: TextInputType.number,
         //style: TextStyle(color: Colors.white, fontSize: 20.0),

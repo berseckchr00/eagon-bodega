@@ -89,10 +89,10 @@ class _OrdersInputState extends State<OrdersInput> {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: _loadComponent('employee')
             ),
-            Padding(
+            /* Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: _loadComponent('machine')
-            ),
+            ), */
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: _loadComponent('ccost')
@@ -106,6 +106,8 @@ class _OrdersInputState extends State<OrdersInput> {
                 //primary: Colors.orange
               ),
               onPressed: (){
+                itemForm.remove('ID_MAQUINA');
+                itemForm.addAll({'ID_MAQUINA': 0});
                 if(!_validateForm()){
                   Fluttertoast.showToast(
                     msg: "Faltan elementos por cargar",
@@ -394,9 +396,9 @@ class _OrdersInputState extends State<OrdersInput> {
     if (!itemForm.containsKey('ID_EMPLEADO')){
       return false;
     }
-    if (!itemForm.containsKey('ID_MAQUINA')){
+    /* if (!itemForm.containsKey('ID_MAQUINA')){
       return false;
-    }
+    } */
     if (!itemForm.containsKey('ID_ITEM_GASTO')){
       return false;
     }

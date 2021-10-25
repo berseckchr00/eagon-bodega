@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:eagon_bodega/src/models/order_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/models/response_order_model.dart';
 import 'package:eagon_bodega/src/pages/orders/order_form_page.dart';
@@ -163,21 +164,32 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     return response;
   }
 
-  void _loadDetail(String args) {
+  void _loadDetail(OrdersModel ordersModel) {
 
-    var jsonData = jsonDecode(args);
-
-    jsonData['detail'].forEach((key, value) { 
+    
+    ordersModel.detalle.forEach((element) {
       _count++;
-        ProductModel _product = value;
-        detalles.add(
-          OrderForm(
-            product: _product,
-            index: _count,
-            onDelete: () => onDelete(_product),
-          )
-        );
+      ProductModel _product = new ProductModel(
+        element.nombreProducto, 
+        null, 
+        element.ubicacion,
+        null, 
+        null, 
+        element.ubicacion, 
+        ordersModel.bodega, 
+        null, 
+        null, 
+        element.codigoProducto, 
+        element.cantidad, 
+        element.unidadMedida
+      );
+      detalles.add(
+        OrderForm(
+          product: _product,
+          index: _count,
+          onDelete: () => onDelete(_product),
+        )
+      );
     });
-
   }
 }

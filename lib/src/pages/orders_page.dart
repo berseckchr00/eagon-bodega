@@ -102,6 +102,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
     with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation<double> scaleAnimation;
+  final TextEditingController _otNumber = new TextEditingController();
 
   @override
   void initState() {
@@ -132,6 +133,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
         TextFormField(
           keyboardType: TextInputType.number,
           style: TextStyle(color: Colors.black, fontSize: 16.0),
+          controller: _otNumber,
           decoration: const InputDecoration(
             hintText: 'Ejemplo: 0098988212',
             contentPadding: EdgeInsets.all(20.0),
@@ -148,7 +150,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
         FlatButton(
             child: Text("Aceptar"),
             textColor: Colors.blue,
-            onPressed: () {
+            onPressed: () {/* 
                Fluttertoast.showToast(
                 msg: "Módulo aún sin implementar",
                 toastLength: Toast.LENGTH_SHORT,
@@ -158,8 +160,8 @@ class FunkyOverlayState extends State<FunkyOverlay>
                 textColor: Colors.white,
                 fontSize: 16.0
               );
-              Navigator.of(context).pop();
-              //Navigator.pushNamed(context, '/orders_input_ot');
+              Navigator.of(context).pop(); */
+              Navigator.pushNamed(context, '/orders_input_ot',arguments: _otNumber.text);
             }),
 
         FlatButton(
