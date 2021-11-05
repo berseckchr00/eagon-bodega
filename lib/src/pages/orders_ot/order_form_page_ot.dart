@@ -61,10 +61,10 @@ class _OrderFormOtState extends State<OrderFormOt> {
                 backgroundColor: Theme.of(context).accentColor,
                 centerTitle: true,
                 actions: <Widget>[
-                  IconButton(
+                  /* IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: widget.onDelete,
-                  )
+                  ) */
                 ],
               ),
               Row(
@@ -73,6 +73,7 @@ class _OrderFormOtState extends State<OrderFormOt> {
                     child:Padding(
                       padding: EdgeInsets.only(left: 5, right: 5, top: 8),
                       child: TextFormField(
+                        enabled: false,
                         initialValue: widget.product.producto,
                         onSaved: (val) => widget.product.producto = val,
                         validator: (val) =>
@@ -118,6 +119,7 @@ class _OrderFormOtState extends State<OrderFormOt> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
+                          enabled: false,
                           //initialValue: widget.product.cantidad,
                           controller:  cantidadEditor,
                           onSaved: (val) => cantidadEditor.text = val,

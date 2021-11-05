@@ -1,10 +1,10 @@
 
 import 'dart:convert';
 
-import 'package:eagon_bodega/src/models/order_model.dart';
+import 'package:eagon_bodega/src/models/ot_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:eagon_bodega/src/models/response_order_model.dart';
-import 'package:eagon_bodega/src/pages/orders/order_form_page.dart';
+import 'package:eagon_bodega/src/pages/orders_ot/order_form_page_ot.dart';
 import 'package:eagon_bodega/src/providers/empty_state_provider.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/utils/alert.dart';
@@ -21,7 +21,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
 
   final TextEditingController _searchProduct = new TextEditingController();
   OutgoingProvider outgoingProvider = new OutgoingProvider();
-  List<OrderForm> detalles = [];
+  List<OrderFormOt> detalles = [];
   int _count = 0;
   Map<String, dynamic> saveData = new Map<String, dynamic>();
   bool _enableButtonSave = true;
@@ -133,7 +133,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
         _count++;
         ProductModel _product = value;
         detalles.add(
-          OrderForm(
+          OrderFormOt(
             product: _product,
             index: _count,
             onDelete: () => onDelete(_product),
@@ -164,27 +164,64 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     return response;
   }
 
-  void _loadDetail(OrdersModel ordersModel) {
+  void _loadDetail(OtModel ordersModel) {
 
-    
-    ordersModel.detalle.forEach((element) {
+    /* List<String> detail = (ordersModel.detail != null)?
+      ordersModel.data[1].resourcesInventory.split(";"):
+      [];
+    var data = ordersModel.data[1];
+
+    detail.forEach((element) {
+      var reQty = RegExp(r"\(([^)]\d)\)", 
+        caseSensitive: false,
+        multiLine: true);
+
+      //var qty = element.split(reQty);
+      var qty = reQty.stringMatch(element.toString());
+      //var qty = reQty.allMatches(element.toString()).map((e) => e.group(0));
+      
+      //var reCode = RegExp(r"(?<=\{)(.*?)(?=\})");
+      var reCode = RegExp(r"(?=\{)(.*?)(?=\})");
+      var code = reCode.stringMatch(element.toString());
+
+      var reProd = RegExp(r"(?=\))(.*?)(?=\{)");
+      var producName = reProd.stringMatch(element.toString());
       _count++;
       ProductModel _product = new ProductModel(
-        element.nombreProducto, 
+        producName.replaceAll(")", ""), 
         null, 
-        element.ubicacion,
-        null, 
-        null, 
-        element.ubicacion, 
-        ordersModel.bodega, 
+        '',
         null, 
         null, 
-        element.codigoProducto, 
-        element.cantidad, 
-        element.unidadMedida
-      );
+        '', 
+        data.parentDescription, 
+        null, 
+        null, 
+        code.replaceAll("{", ""), 
+        qty.replaceAll("(", "").replaceAll(")", ""), 
+        ''
+      ); */
+
+      
+      ordersModel.detail.forEach((element) {
+        _count++;
+        ProductModel _product = new ProductModel(
+          element.matDesc,
+          null, 
+          '',
+          null, 
+          null, 
+          '', 
+          element.matDesc, 
+          null, 
+          null, 
+          element.matCod, 
+          element.detCant, 
+          ''
+        );
+
       detalles.add(
-        OrderForm(
+        OrderFormOt(
           product: _product,
           index: _count,
           onDelete: () => onDelete(_product),

@@ -1,9 +1,10 @@
 
 import 'package:eagon_bodega/src/forms/orders_input_form.dart';
-import 'package:eagon_bodega/src/models/order_model.dart';
+import 'package:eagon_bodega/src/models/ot_model.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class OrdersInputOt extends StatefulWidget {
   OrdersInputOt({Key key}) : super(key: key);
@@ -17,7 +18,7 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
   OrderInputForm orderInputField = new OrderInputForm();
   WareHouseProvider wareHouseProvider = new WareHouseProvider();
   OutgoingProvider outgoingProvider = new OutgoingProvider(); 
-  OrdersModel responseOt = new OrdersModel();
+  OtModel responseOt = new OtModel();
   final TextEditingController _ctrlWarehouse = new TextEditingController();
   final TextEditingController _ctrlEmployee = new TextEditingController();
   final TextEditingController _ctrlMachine = new TextEditingController();
@@ -40,11 +41,16 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
       getOtData(args).then((value) => {
         setState(() {
           responseOt = value;
-          _ctrlWarehouse.text = responseOt.bodega;
-          _ctrlEmployee.text = responseOt.nombreSolicitante;
-          _ctrlMachine.text = responseOt.maquina;
-          _ctrlCcost.text = responseOt.centroCosto;
-          _ctrlItemCost.text = responseOt.itemGasto;
+          if (responseOt.detail.isNotEmpty){
+            _ctrlWarehouse.text = responseOt.idOt;            
+            final f = new DateFormat('dd-MM-yyyy');
+            var fchEmis = f.format(DateTime.parse(responseOt.fechaOt));
+            
+            _ctrlEmployee.text = fchEmis;
+            _ctrlMachine.text = responseOt.descripcionActivo;
+            _ctrlCcost.text = responseOt.descripciponTarea;
+            _ctrlItemCost.text = responseOt.solicitadoPor;
+          }
         })
       });
     });
@@ -77,23 +83,23 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField((responseOt != null)?responseOt.bodega:'', "Bodega", _ctrlWarehouse)
+              child: _createTextFormField((responseOt.idOt != null)?responseOt.idOt:'', "Número OT", _ctrlWarehouse)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField((responseOt != null)?responseOt.nombreSolicitante:'', "Empleado", _ctrlEmployee)
+              child: _createTextFormField((responseOt.fechaOt  != null)?responseOt.fechaOt:'', "Fecha", _ctrlEmployee)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField((responseOt != null)?responseOt.maquina:'', "Maquina", _ctrlMachine)
+              child: _createTextFormField((responseOt.descripcionActivo  != null)?responseOt.descripcionActivo:'', "Descripción Activo", _ctrlMachine)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField((responseOt != null)?responseOt.centroCosto:'', "Centro Costo", _ctrlCcost)
+              child: _createTextFormField((responseOt.descripciponTarea  != null)?responseOt.descripciponTarea:'', "Descripción Tarea", _ctrlCcost)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _createTextFormField((responseOt != null)?responseOt.itemGasto:'', "Item de Gasto", _ctrlItemCost)
+              child: _createTextFormField((responseOt.solicitadoPor != null)?responseOt.solicitadoPor:'', "Solcitado por", _ctrlItemCost)
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -112,9 +118,8 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
     );
   }
 
-  Future<OrdersModel> getOtData(String otNumber) async {    
-    OrdersModel response = await outgoingProvider.getOtData(otNumber);
-    print(otNumber);
+  Future<OtModel> getOtData(String otNumber) async {    
+    OtModel response = await outgoingProvider.getOtData(otNumber);
     return response;
   }
 
