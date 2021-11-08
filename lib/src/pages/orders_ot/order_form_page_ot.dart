@@ -23,11 +23,13 @@ class _OrderFormOtState extends State<OrderFormOt> {
   final form = GlobalKey<FormState>();
   TextEditingController cantidadEditor ;
   TextEditingController unidadMedidaEditor;
+  TextEditingController ubicacionEditor;
 
   @override
   Widget build(BuildContext context) {
     cantidadEditor = new TextEditingController(text: widget.product.cantidad);
     unidadMedidaEditor = new TextEditingController(text: widget.product.unidadMedida);
+    ubicacionEditor = new TextEditingController(text: '');
     return Padding(
       padding: EdgeInsets.only(top: 5, bottom: 0, left: 10, right: 10),
       child: Material(
@@ -93,11 +95,11 @@ class _OrderFormOtState extends State<OrderFormOt> {
                         padding: EdgeInsets.only(left: 5, right: 5, top: 8),
                         child: 
                         TextFormField(
-                          initialValue: widget.product.nombre,
-                          onSaved: (val) => widget.product.idUbicacion = val,
-                          keyboardType: TextInputType.number,
+                          controller: ubicacionEditor, 
+                          onSaved: (val) => ubicacionEditor.text = val,
+                          //keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
+                            FilteringTextInputFormatter.allow((RegExp("[.0-9_]"))) ,
                           ],
                           validator: (val) =>
                               int.parse(val) < 1 ? null : 'Ubicación',

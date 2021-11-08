@@ -29,9 +29,10 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context).settings.arguments;
-    
-    saveData.addAll({'data':args});
+    OtModel args = ModalRoute.of(context).settings.arguments;
+    //OtModel ot = OtModel.fromJson(jsonDecode(args));
+    var head = {'head':{'ID_OT':args.idOt}};
+    saveData.addAll(head);
 
     _loadDetail(args);
 
@@ -45,9 +46,9 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
             child: Text('Guardar'),
             textColor: Colors.white,
             onPressed: (!_enableButtonSave)?null:(){
-              setState(() {
+              /* setState(() {
                 _enableButtonSave = false;
-              });
+              }); */
               _saveOrder().then((value){
                 if (value.success){
                   var baseDialog = BaseAlertDialog(
@@ -57,7 +58,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
                     Navigator.pushNamed(context, '/orders');
                   },
                   noOnPressed: () {
-                    Navigator.pushNamed(context, "/orders_input");
+                    Navigator.pushNamed(context, "/orders");
                   },
                   color: Colors.green.shade100,
                   yes: "OK",
@@ -115,17 +116,6 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     );
   }
 
-  ///on form user deleted
-  void onDelete(ProductModel _detail) {
-    setState(() {
-      var find = detalles.firstWhere(
-        (it) => it.product == _detail,
-        orElse: () => null,
-      );
-      if (find != null) detalles.removeAt(detalles.indexOf(find));
-    });
-  }
-
   ///on add form
   void onAddForm() {
     getProduct(_searchProduct.text).then((value) {
@@ -136,7 +126,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
           OrderFormOt(
             product: _product,
             index: _count,
-            onDelete: () => onDelete(_product),
+            onDelete: () => null
           )
         );
       });
@@ -153,56 +143,20 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     detalles.forEach((element) {
       arr.add({
         "CODIGO_PRODUCTO" : element.product.producto,
-        "ID_UBICACION" : element.product.idUbicacion,
+        "ID_UBICACION" : element.state.ubicacionEditor.text,
         "CANTIDAD" : element.state.cantidadEditor.text,
         "UNIDAD_MEDIDA" : element.state.unidadMedidaEditor.text
       });
     });
 
     saveData.addAll({'detail':arr});
+
     ResponseOrderModel response = await outgoingProvider.saveOrder(saveData);
     return response;
   }
 
   void _loadDetail(OtModel ordersModel) {
 
-    /* List<String> detail = (ordersModel.detail != null)?
-      ordersModel.data[1].resourcesInventory.split(";"):
-      [];
-    var data = ordersModel.data[1];
-
-    detail.forEach((element) {
-      var reQty = RegExp(r"\(([^)]\d)\)", 
-        caseSensitive: false,
-        multiLine: true);
-
-      //var qty = element.split(reQty);
-      var qty = reQty.stringMatch(element.toString());
-      //var qty = reQty.allMatches(element.toString()).map((e) => e.group(0));
-      
-      //var reCode = RegExp(r"(?<=\{)(.*?)(?=\})");
-      var reCode = RegExp(r"(?=\{)(.*?)(?=\})");
-      var code = reCode.stringMatch(element.toString());
-
-      var reProd = RegExp(r"(?=\))(.*?)(?=\{)");
-      var producName = reProd.stringMatch(element.toString());
-      _count++;
-      ProductModel _product = new ProductModel(
-        producName.replaceAll(")", ""), 
-        null, 
-        '',
-        null, 
-        null, 
-        '', 
-        data.parentDescription, 
-        null, 
-        null, 
-        code.replaceAll("{", ""), 
-        qty.replaceAll("(", "").replaceAll(")", ""), 
-        ''
-      ); */
-
-      
       ordersModel.detail.forEach((element) {
         _count++;
         ProductModel _product = new ProductModel(
@@ -224,7 +178,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
         OrderFormOt(
           product: _product,
           index: _count,
-          onDelete: () => onDelete(_product),
+          onDelete: () => null,
         )
       );
     });

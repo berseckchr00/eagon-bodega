@@ -171,8 +171,6 @@ class OutgoingProvider{
       final resp = await http.post( uri, body: queryParameters,  headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
 
-      print(data);
-
       ResponseOrderModel response = ResponseOrderModel.fromJson(jsonDecode(data));
       return response;
       //return warehouse;
