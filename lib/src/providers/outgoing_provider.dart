@@ -195,8 +195,8 @@ class OutgoingProvider{
       
       final resp = await http.get( uri, headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
-
-      OtModel order = OtModel.fromJson(jsonDecode(data)[0]);
+      var jsonResponse = jsonDecode(data)[0];
+      OtModel order = OtModel.fromJson(jsonResponse);
       return order; 
 
     }catch(ex){

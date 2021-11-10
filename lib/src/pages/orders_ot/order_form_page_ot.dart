@@ -129,13 +129,20 @@ class _OrderFormOtState extends State<OrderFormOt> {
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
                           ],
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                          ),
                           validator: (val) =>
                               int.parse(val) < 1 ? null : 'Cantidad Inválida',
                           decoration: InputDecoration(
                             labelText: 'Cantidad',
+                            labelStyle: new TextStyle(color: Colors.red),
                             hintText: 'Ingresa cantidad',
                             icon: Icon(Icons.production_quantity_limits),
                             isDense: true,
+                            
                           ),
                         ),
                       ),

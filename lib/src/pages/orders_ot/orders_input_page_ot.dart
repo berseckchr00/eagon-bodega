@@ -3,6 +3,7 @@ import 'package:eagon_bodega/src/forms/orders_input_form.dart';
 import 'package:eagon_bodega/src/models/ot_model.dart';
 import 'package:eagon_bodega/src/providers/outgoing_provider.dart';
 import 'package:eagon_bodega/src/providers/warehause_provider.dart';
+import 'package:eagon_bodega/src/utils/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -41,15 +42,19 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
       getOtData(args).then((value) => {
         setState(() {
           responseOt = value;
-          if (responseOt.detail.isNotEmpty){
-            _ctrlWarehouse.text = responseOt.idOt;            
-            final f = new DateFormat('dd-MM-yyyy');
-            var fchEmis = f.format(DateTime.parse(responseOt.fechaOt));
-            
-            _ctrlEmployee.text = fchEmis;
-            _ctrlMachine.text = responseOt.descripcionActivo;
-            _ctrlCcost.text = responseOt.descripciponTarea;
-            _ctrlItemCost.text = responseOt.solicitadoPor;
+          if (value == null){
+            _showMessage();
+          }else{
+            if (responseOt.detail.isNotEmpty){
+              _ctrlWarehouse.text = responseOt.idOt;            
+              final f = new DateFormat('dd-MM-yyyy');
+              var fchEmis = f.format(DateTime.parse(responseOt.fechaOt));
+              
+              _ctrlEmployee.text = fchEmis;
+              _ctrlMachine.text = responseOt.descripcionActivo;
+              _ctrlCcost.text = responseOt.descripciponTarea;
+              _ctrlItemCost.text = responseOt.solicitadoPor;
+            }
           }
         })
       });
@@ -146,5 +151,22 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
     },
   );
  }
+
+  void _showMessage() {
+     var baseDialog = BaseAlertDialog(
+        title: "Confirmación",
+        content: "No se pudo encontrar OT",
+        yesOnPressed: () {
+          Navigator.pushNamed(context, '/orders');
+        },
+        noOnPressed: () {
+          Navigator.pushNamed(context, "/orders");
+        },
+        color: Colors.green.shade100,
+        yes: "OK",
+        no: "Cancelar");
+
+        showDialog(context: context, builder: (BuildContext context) => baseDialog);
+  }
 
 }
