@@ -34,13 +34,16 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     var head = {'head':{'ID_OT':args.idOt}};
     saveData.addAll(head);
 
+    if (detalles.length <= 0){
     _loadDetail(args);
+    }
 
     return 
      Scaffold(
       appBar: AppBar(
         elevation: .0,
-        title: Text("Ingreso detalle"),//_inputSearchField(),
+        title: Text("Ingreso detalle"),
+        backgroundColor: Colors.orange,//_inputSearchField(),
         actions: <Widget>[
           FlatButton(
             child: Text('Guardar'),
@@ -91,11 +94,11 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
         child: 
           Column(
             children: [
-              /* Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child:
                   _inputSearchField(),
-              ), */
+              ),
               detalles.length <= 0
                 ? Center(
                     child: EmptyState(
@@ -105,7 +108,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
                   )
                 : Expanded(
                   child: ListView.builder(
-                    addAutomaticKeepAlives: true,
+                    addAutomaticKeepAlives: false,
                     itemCount: detalles.length,
                     itemBuilder: (_, i) => detalles[i],
                   ),
@@ -116,6 +119,53 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     );
   }
 
+  _inputSearchField() {
+    return Padding(
+        padding: EdgeInsets.only(top: 5, bottom: 0, left: 0, right: 0),
+        child: TextFormField(
+        autofocus: true,
+        controller: _searchProduct,
+        //keyboardType: TextInputType.number,
+        //style: TextStyle(color: Colors.white, fontSize: 20.0),
+        decoration: InputDecoration(
+          labelText: "Escanea una ubicación",
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.orange,
+              width: 2.0,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5.0),
+            borderSide: BorderSide(
+              color: Colors.orange,
+            ),
+          ),
+          focusColor: Colors.grey.shade100,
+          fillColor: Colors.grey.shade300,
+          hintStyle: TextStyle(
+            color: Colors.orange.shade300
+          ),
+          labelStyle: TextStyle(
+            color: Colors.orange.shade900
+          ), 
+        ),
+        validator: (value){
+          if(value.isEmpty){
+            return 'Valor inválido';
+          }
+          return null;
+        },
+        onFieldSubmitted: (String value){
+          //TODO: realizar search product y meter en la lista de formularios...
+          getProduct(value).then((value) {
+            _reprintFormsSearch(value);
+          });
+          _searchProduct.clear();
+        },
+      )
+    );
+  }
   ///on add form
   void onAddForm() {
     getProduct(_searchProduct.text).then((value) {
@@ -182,5 +232,31 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
         )
       );
     });
+  }
+
+  Future<ProductModel> _reprintFormsSearch(ProductModel product) {
+    if (product.glosa == null){
+      var baseDialog = BaseAlertDialog(
+        title: "Error",
+        content: "No se pudo asignar el producto.",
+        yesOnPressed: () {
+          Navigator.of(context, rootNavigator: true)
+          .pop();
+        },
+        color: Colors.red.shade100,
+        yes: "OK");
+
+        showDialog(context: context, builder: (BuildContext context) => baseDialog);
+    }else{
+      detalles.forEach((element) {
+        var productCode = element.product.producto.replaceAll(' ','');
+        if(productCode == product.producto){
+          setState(() {  
+            element.state.ubicacionEditor.text = product.idUbicacion;
+            element.state.unidadMedidaEditor.text = product.unidadMedida;
+          });
+        }
+      });
+    }
   }
 }

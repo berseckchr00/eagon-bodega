@@ -67,13 +67,14 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
   @override
   Widget build(BuildContext context) {
 
-    return (responseOt == null)? const Center(child: const CircularProgressIndicator()): new Scaffold(
+    return  new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: new Text("Generación de Pedido"),
+        backgroundColor: Colors.orange,
       ),
-      body: 
+      body: (responseOt.idOt == null)? const Center(child: const CircularProgressIndicator()):
         new SingleChildScrollView(
         child: new Center(
           // Center is a layout widget. It takes a single child and positions it
@@ -108,7 +109,7 @@ class _OrdersInputOtState extends State<OrdersInputOt> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                //primary: Colors.orange
+                 primary: Colors.orange
               ),
               onPressed: (){
                 Navigator.pushNamed(context, "/orders_input_detail_ot", arguments: responseOt);

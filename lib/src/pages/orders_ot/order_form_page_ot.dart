@@ -48,19 +48,20 @@ class _OrderFormOtState extends State<OrderFormOt> {
                    Material(
                       elevation: 5,
                       borderRadius: BorderRadius.circular(100),
-                      color: Colors.grey,
+                      color: Colors.orange.shade300,
                       child: Center(
                         child: 
                           Text(widget.index.toString(),
                           style: TextStyle(
-                            fontSize: 20
+                            fontSize: 20,
+                            color: Colors.white
                           ),
                         )),
                     ),
                   ),
                 //elevation: 0,
                 title: Text(widget.product.glosa),
-                backgroundColor: Theme.of(context).accentColor,
+                backgroundColor: Colors.grey,
                 centerTitle: true,
                 actions: <Widget>[
                   /* IconButton(
@@ -95,6 +96,7 @@ class _OrderFormOtState extends State<OrderFormOt> {
                         padding: EdgeInsets.only(left: 5, right: 5, top: 8),
                         child: 
                         TextFormField(
+                          enabled: false,
                           controller: ubicacionEditor, 
                           onSaved: (val) => ubicacionEditor.text = val,
                           //keyboardType: TextInputType.number,
@@ -153,6 +155,7 @@ class _OrderFormOtState extends State<OrderFormOt> {
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
                         child: 
                         TextFormField(
+                          enabled: false,
                           //initialValue: widget.product.unidadMedida,
                           controller: unidadMedidaEditor,
                           onSaved: (val) => unidadMedidaEditor.text = val,
