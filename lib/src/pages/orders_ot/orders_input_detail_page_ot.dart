@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:eagon_bodega/src/models/ot_model.dart';
 import 'package:eagon_bodega/src/models/product_model.dart';
@@ -49,44 +50,63 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
             child: Text('Guardar'),
             textColor: Colors.white,
             onPressed: (!_enableButtonSave)?null:(){
-              /* setState(() {
-                _enableButtonSave = false;
-              }); */
-              _saveOrder().then((value){
-                if (value.success){
-                  var baseDialog = BaseAlertDialog(
-                  title: "Confirmación",
-                  content: value.msg + ' \nNumero Orden:'+ value.lastId.toString(),
-                  yesOnPressed: () {
-                    Navigator.pushNamed(context, '/orders');
-                  },
-                  noOnPressed: () {
-                    Navigator.pushNamed(context, "/orders");
-                  },
-                  color: Colors.green.shade100,
-                  yes: "OK",
-                  no: "Nuevo");
+              var validState = detalles.firstWhere((e) => e.product.idUbicacion == null, orElse: () => null);
 
-                  showDialog(context: context, builder: (BuildContext context) => baseDialog);
-                }else{
-                  var baseDialog = BaseAlertDialog(
-                  title: "Error",
-                  content: value.msg,
-                  yesOnPressed: () {
-                    Navigator.of(context, rootNavigator: true)
-                    .pop();
+              if (validState == null){
+                _saveOrder().then((value){
+                  if (value.success){
+                    var baseDialog = BaseAlertDialog(
+                    title: "Confirmación",
+                    content: value.msg + ' \nNumero Orden:'+ value.lastId.toString(),
+                    yesOnPressed: () {
+                      Navigator.pushNamed(context, '/orders');
+                    },
+                    noOnPressed: () {
+                      Navigator.pushNamed(context, "/orders");
+                    },
+                    color: Colors.green.shade100,
+                    yes: "OK",
+                    no: "Nuevo");
 
-                    setState(() {
-                      _enableButtonSave = false;
-                    });
-                  },
-                  color: Colors.red.shade100,
-                  yes: "OK");
+                    showDialog(context: context, builder: (BuildContext context) => baseDialog);
+                  }else{
+                    var baseDialog = BaseAlertDialog(
+                    title: "Error",
+                    content: value.msg,
+                    yesOnPressed: () {
+                      Navigator.of(context, rootNavigator: true)
+                      .pop();
 
-                  showDialog(context: context, builder: (BuildContext context) => baseDialog);
-                }
-              });
-            },
+                      setState(() {
+                        _enableButtonSave = false;
+                      });
+                    },
+                    color: Colors.red.shade100,
+                    yes: "OK",
+                    no: null,);
+
+                    showDialog(context: context, builder: (BuildContext context) => baseDialog);
+                  }
+                });
+              
+              }else{
+                var baseDialog = BaseAlertDialog(
+                    title: "Error",
+                    content: "Existen ubicaciones vacias!",
+                    yesOnPressed: () {
+                      Navigator.of(context, rootNavigator: true)
+                      .pop();
+
+                      setState(() {
+                        _enableButtonSave = true;
+                      });
+                    },
+                    color: Colors.red.shade100,
+                    yes: "OK");
+
+                    showDialog(context: context, builder: (BuildContext context) => baseDialog);
+              }
+              },
           )
         ],
       ),
@@ -98,17 +118,9 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child:
                   _inputSearchField(),
-              ),
-              detalles.length <= 0
-                ? Center(
-                    child: EmptyState(
-                      title: 'Oops',
-                      message: 'Debes ingresar al menos un producto',
-                    ),
-                  )
-                : Expanded(
+              ),Expanded(
                   child: ListView.builder(
-                    addAutomaticKeepAlives: false,
+                    addAutomaticKeepAlives: true,
                     itemCount: detalles.length,
                     itemBuilder: (_, i) => detalles[i],
                   ),
@@ -123,7 +135,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     return Padding(
         padding: EdgeInsets.only(top: 5, bottom: 0, left: 0, right: 0),
         child: TextFormField(
-        autofocus: true,
+        //autofocus: true,
         controller: _searchProduct,
         //keyboardType: TextInputType.number,
         //style: TextStyle(color: Colors.white, fontSize: 20.0),
@@ -250,11 +262,70 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
     }else{
       detalles.forEach((element) {
         var productCode = element.product.producto.replaceAll(' ','');
-        if(productCode == product.producto){
-          setState(() {  
-            element.state.ubicacionEditor.text = product.idUbicacion;
-            element.state.unidadMedidaEditor.text = product.unidadMedida;
-          });
+        var cant = double.parse(product.cantidad);
+        if(double.parse(element.product.cantidad) > cant){
+          var baseDialog = BaseAlertDialog(
+            title: "Error",
+            content: "La cantidad del producto no es suficiente, ¿desea generar otra linea de detalle?",
+            yesOnPressed: () {
+              setState(() {
+                
+                _count++;
+                  ProductModel _product = new ProductModel(
+                    element.product.glosa,
+                    null, 
+                    '',
+                    null, 
+                    null, 
+                    '', 
+                    element.product.glosa, 
+                    null, 
+                    null, 
+                    element.product.producto, 
+                    element.product.cantidad, 
+                    ''
+                  );
+
+                detalles.add(
+                  OrderFormOt(
+                    product: _product,
+                    index: _count,
+                    onDelete: () => null,
+                  )
+                );
+                
+              });
+              Navigator.of(context, rootNavigator: true)
+              .pop();
+            },
+            noOnPressed: (){
+              Navigator.of(context, rootNavigator: true)
+              .pop();
+            },
+            color: Colors.red.shade100,
+            yes: "Sí",
+            no: "No",);
+
+            showDialog(context: context, builder: (BuildContext context) => baseDialog);
+
+             if(productCode == product.producto){
+              element.state.ubicacionEditor.text = product.idUbicacion;
+              element.state.unidadMedidaEditor.text = product.unidadMedida;
+              detalles.elementAt(element.index-1).product.idUbicacion = product.idUbicacion;
+              detalles.elementAt(element.index-1).product.unidadMedida = product.unidadMedida;
+              
+            }
+
+        }else{
+
+          if(productCode == product.producto){
+            setState(() {  
+              element.state.ubicacionEditor.text = product.idUbicacion;
+              element.state.unidadMedidaEditor.text = product.unidadMedida;
+              detalles.elementAt(element.index-1).product.idUbicacion = product.idUbicacion;
+              detalles.elementAt(element.index-1).product.unidadMedida = product.unidadMedida;
+            });
+          }
         }
       });
     }

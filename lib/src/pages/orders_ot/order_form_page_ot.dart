@@ -60,7 +60,9 @@ class _OrderFormOtState extends State<OrderFormOt> {
                     ),
                   ),
                 //elevation: 0,
-                title: Text(widget.product.glosa),
+                title: Text(widget.product.glosa,
+                    style: TextStyle(fontSize: 16),
+                ),
                 backgroundColor: Colors.grey,
                 centerTitle: true,
                 actions: <Widget>[
