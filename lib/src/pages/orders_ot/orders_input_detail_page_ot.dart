@@ -290,7 +290,7 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
                   OrderFormOt(
                     product: _product,
                     index: _count,
-                    onDelete: () => null,
+                    onDelete: () => null
                   )
                 );
                 

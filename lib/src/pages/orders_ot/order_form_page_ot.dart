@@ -14,7 +14,7 @@ class OrderFormOt extends StatefulWidget {
 
   OrderFormOt({Key key, this.product, this.index, this.onDelete}) : super(key: key);
   @override
-  _OrderFormOtState createState() => state;
+  _OrderFormOtState createState() => _OrderFormOtState();
 
   bool isValid() => state.validate();
 }
