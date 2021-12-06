@@ -11,8 +11,9 @@ class OrderFormOt extends StatefulWidget {
   final state = _OrderFormOtState();
   final OnDelete onDelete;
   final index;
+  final Color backgroundColor ;
 
-  OrderFormOt({Key key, this.product, this.index, this.onDelete}) : super(key: key);
+  OrderFormOt({Key key, this.product, this.index, this.onDelete, this.backgroundColor}) : super(key: key);
   @override
   _OrderFormOtState createState() => _OrderFormOtState();
 
@@ -63,7 +64,7 @@ class _OrderFormOtState extends State<OrderFormOt> {
                 title: Text(widget.product.glosa,
                     style: TextStyle(fontSize: 16),
                 ),
-                backgroundColor: Colors.grey,
+                backgroundColor: (widget.backgroundColor == null)?Colors.grey: widget.backgroundColor,
                 centerTitle: true,
                 actions: <Widget>[
                   /* IconButton(

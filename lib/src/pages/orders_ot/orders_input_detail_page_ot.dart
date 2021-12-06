@@ -290,7 +290,8 @@ class _OrderCreatePageOtState extends State<OrderCreatePageOt> {
                   OrderFormOt(
                     product: _product,
                     index: _count,
-                    onDelete: () => null
+                    onDelete: () => null,
+                    backgroundColor:  Colors.green.shade300,
                   )
                 );
                 
