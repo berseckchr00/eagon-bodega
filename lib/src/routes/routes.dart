@@ -8,18 +8,16 @@ import 'package:eagon_bodega/src/pages/orders/orders_input_page.dart';
 import 'package:eagon_bodega/src/pages/orders_ot/orders_input_detail_page_ot.dart';
 import 'package:eagon_bodega/src/pages/orders_ot/orders_input_page_ot.dart';
 import 'package:eagon_bodega/src/pages/orders_page.dart';
+import 'package:eagon_bodega/src/pages/receptions/reception_search.dart';
 import 'package:flutter/material.dart';
 
-
-Map <String,WidgetBuilder> getApplicationRoutes(){ 
-
-
-  return <String,WidgetBuilder>{
-    '/login' : (context) => LoginPage(),
-    '/home' : (BuildContext context) => HomePage(),
-    '/orders' : (BuildContext context) => OrdersPage(),
-    '/orders_input' : (BuildContext context) => OrdersInput(),
-    '/orders_input_detail' : (BuildContext context) => OrderCreatePage(),
+Map<String, WidgetBuilder> getApplicationRoutes() {
+  return <String, WidgetBuilder>{
+    '/login': (context) => LoginPage(),
+    '/home': (BuildContext context) => HomePage(),
+    '/orders': (BuildContext context) => OrdersPage(),
+    '/orders_input': (BuildContext context) => OrdersInput(),
+    '/orders_input_detail': (BuildContext context) => OrderCreatePage(),
     '/orders_input_ot': (BuildContext conext) => OrdersInputOt(),
     '/orders_input_detail_ot': (BuildContext context) => OrderCreatePageOt(),
     /* '/reception' : (BuildContext context) => ReceptionPage(),
@@ -27,10 +25,11 @@ Map <String,WidgetBuilder> getApplicationRoutes(){
     '/reception_list' : (BuildContext context) => ReceptionOrderList(),
     '/reception_quantity' : (BuildContext context) => ReceptionQuantity(),
      */
-    '/allocate' : (BuildContext context) => AllocatePage(),
-    '/allocate_assign' : (BuildContext context) => AllocateAssignPage(),
+    '/allocate': (BuildContext context) => AllocatePage(),
+    '/allocate_assign': (BuildContext context) => AllocateAssignPage(),
     //'/sortable_list' : (BuildContext context) => SortableList(),
-    '/logout' : (BuildContext context) => LoginPage(),
+    '/logout': (BuildContext context) => LoginPage(),
+    '/reception_search': (BuildContext context) => ReceptionPage(),
     //'/alert' : (BuildContext context) => StatefulDialog(),
     //'/login' : (BuildContext context) => LoginPage(),
   };

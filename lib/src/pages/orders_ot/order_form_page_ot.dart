@@ -1,4 +1,3 @@
-
 import 'package:eagon_bodega/src/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,14 +5,15 @@ import 'package:flutter/services.dart';
 typedef OnDelete();
 
 class OrderFormOt extends StatefulWidget {
-
-  final ProductModel product ;
+  final ProductModel product;
   final state = _OrderFormOtState();
   final OnDelete onDelete;
   final index;
-  final Color backgroundColor ;
+  Color backgroundColor;
 
-  OrderFormOt({Key key, this.product, this.index, this.onDelete, this.backgroundColor}) : super(key: key);
+  OrderFormOt(
+      {Key key, this.product, this.index, this.onDelete, this.backgroundColor})
+      : super(key: key);
   @override
   _OrderFormOtState createState() => _OrderFormOtState();
 
@@ -22,15 +22,18 @@ class OrderFormOt extends StatefulWidget {
 
 class _OrderFormOtState extends State<OrderFormOt> {
   final form = GlobalKey<FormState>();
-  TextEditingController cantidadEditor ;
-  TextEditingController unidadMedidaEditor;
-  TextEditingController ubicacionEditor;
+  TextEditingController cantidadEditor = new TextEditingController(text: '');
+  TextEditingController unidadMedidaEditor =
+      new TextEditingController(text: '');
+  TextEditingController ubicacionEditor = new TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
     cantidadEditor = new TextEditingController(text: widget.product.cantidad);
-    unidadMedidaEditor = new TextEditingController(text: widget.product.unidadMedida);
-    ubicacionEditor = new TextEditingController(text: '');
+    unidadMedidaEditor =
+        new TextEditingController(text: widget.product.unidadMedida);
+    ubicacionEditor =
+        new TextEditingController(text: widget.product.idUbicacion);
     return Padding(
       padding: EdgeInsets.only(top: 5, bottom: 0, left: 10, right: 10),
       child: Material(
@@ -38,45 +41,43 @@ class _OrderFormOtState extends State<OrderFormOt> {
         clipBehavior: Clip.antiAlias,
         borderRadius: BorderRadius.circular(8),
         child: Form(
-          key: form,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              AppBar(
-                leading: Padding(
-                  padding: EdgeInsets.all(5),
-                  child:
-                   Material(
+            key: form,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                AppBar(
+                  leading: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Material(
                       elevation: 5,
                       borderRadius: BorderRadius.circular(100),
                       color: Colors.orange.shade300,
                       child: Center(
-                        child: 
-                          Text(widget.index.toString(),
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white
-                          ),
-                        )),
+                          child: Text(
+                        widget.index.toString(),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      )),
                     ),
                   ),
-                //elevation: 0,
-                title: Text(widget.product.glosa,
+                  //elevation: 0,
+                  title: Text(
+                    widget.product.glosa,
                     style: TextStyle(fontSize: 16),
-                ),
-                backgroundColor: (widget.backgroundColor == null)?Colors.grey: widget.backgroundColor,
-                centerTitle: true,
-                actions: <Widget>[
-                  /* IconButton(
+                  ),
+                  backgroundColor: (widget.backgroundColor == null)
+                      ? Colors.grey
+                      : widget.backgroundColor,
+                  centerTitle: true,
+                  actions: <Widget>[
+                    /* IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: widget.onDelete,
                   ) */
-                ],
-              ),
-              Row(
-                children: [
+                  ],
+                ),
+                Row(children: [
                   Expanded(
-                    child:Padding(
+                    child: Padding(
                       padding: EdgeInsets.only(left: 5, right: 5, top: 8),
                       child: TextFormField(
                         enabled: false,
@@ -94,51 +95,48 @@ class _OrderFormOtState extends State<OrderFormOt> {
                     ),
                   ),
                   Expanded(
-                    child: 
-                      Padding(
-                        padding: EdgeInsets.only(left: 5, right: 5, top: 8),
-                        child: 
-                        TextFormField(
-                          enabled: false,
-                          controller: ubicacionEditor, 
-                          onSaved: (val) => ubicacionEditor.text = val,
-                          //keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow((RegExp("[.0-9_]"))) ,
-                          ],
-                          validator: (val) =>
-                              int.parse(val) < 1 ? null : 'Ubicación',
-                          decoration: InputDecoration(
-                            labelText: 'Ubicación',
-                            hintText: 'Ingresa una ubicación',
-                            icon: Icon(Icons.production_quantity_limits),
-                            isDense: true,
-                          ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, top: 8),
+                      child: TextFormField(
+                        enabled: false,
+                        controller: ubicacionEditor,
+                        onSaved: (val) => ubicacionEditor.text = val,
+                        //keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                              (RegExp("[.0-9_]"))),
+                        ],
+                        validator: (val) =>
+                            int.parse(val) < 1 ? null : 'Ubicación',
+                        decoration: InputDecoration(
+                          labelText: 'Ubicación',
+                          hintText: 'Ingresa una ubicación',
+                          icon: Icon(Icons.production_quantity_limits),
+                          isDense: true,
                         ),
                       ),
-                    )
+                    ),
+                  )
                 ]),
-              Row(
-                children: [
-                  Expanded(
-                    child:
-                      Padding(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
-                        child: 
-                        TextFormField(
+                        child: TextFormField(
                           enabled: false,
                           //initialValue: widget.product.cantidad,
-                          controller:  cantidadEditor,
+                          controller: cantidadEditor,
                           onSaved: (val) => cantidadEditor.text = val,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
+                            FilteringTextInputFormatter.allow(
+                                (RegExp("[.0-9]"))),
                           ],
                           style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18
-                          ),
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
                           validator: (val) =>
                               int.parse(val) < 1 ? null : 'Cantidad Inválida',
                           decoration: InputDecoration(
@@ -147,17 +145,14 @@ class _OrderFormOtState extends State<OrderFormOt> {
                             hintText: 'Ingresa cantidad',
                             icon: Icon(Icons.production_quantity_limits),
                             isDense: true,
-                            
                           ),
                         ),
                       ),
-                  ),
-                  Expanded(
-                    child: 
-                      Padding(
+                    ),
+                    Expanded(
+                      child: Padding(
                         padding: EdgeInsets.only(left: 5, right: 5, bottom: 16),
-                        child: 
-                        TextFormField(
+                        child: TextFormField(
                           enabled: false,
                           //initialValue: widget.product.unidadMedida,
                           controller: unidadMedidaEditor,
@@ -165,8 +160,9 @@ class _OrderFormOtState extends State<OrderFormOt> {
                           /* inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow((RegExp("[.0-9]"))) ,
                           ], */
-                          validator: (val) =>
-                              int.parse(val) < 1 ? null : 'Unidad Medida Inválida',
+                          validator: (val) => int.parse(val) < 1
+                              ? null
+                              : 'Unidad Medida Inválida',
                           decoration: InputDecoration(
                             labelText: 'Unidad Medida',
                             hintText: 'Ingresa unidad de medida',
@@ -179,10 +175,9 @@ class _OrderFormOtState extends State<OrderFormOt> {
                   ],
                 ),
               ],
-            )
-          ),
-        ),
-      );
+            )),
+      ),
+    );
   }
 
   ///form validator
