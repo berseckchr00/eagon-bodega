@@ -153,8 +153,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     Timer(Duration(seconds: 1), () {
                       _toggleSubmitState();
                       // 5 seconds over, navigate to Page2.
-                      Navigator.pushNamed(context, '/reception_search');
+                      //Navigator.pushNamed(context, '/reception_search');
                       //Navigator.pushNamed(context, '/orders');
+                      Navigator.pushNamed(context, '/home_blank');
                     })
                   }
                 else

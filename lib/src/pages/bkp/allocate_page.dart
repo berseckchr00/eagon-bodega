@@ -3,17 +3,18 @@ import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/pages/navdrawer_page.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:eagon_bodega/src/shared_preferences/user_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 
-class HomePage extends StatefulWidget {
+class AllocatePage extends StatefulWidget {
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _AllocatePageState createState() => _AllocatePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _AllocatePageState extends State<AllocatePage> {
   final Map<String, String> _formData = {'rut': null, 'folio': null};
   final _formKey = GlobalKey<FormState>();
   final prefs = new PreferenciasUsuario();
@@ -119,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                             Padding(
                               padding: EdgeInsets.all(10.0),
                               child: Text(
-                              'Recepciones Pendientes',
+                              'Recepciones por Asignar',
                                 style: new TextStyle(
                                   fontSize: 18.0,
                                   color: Colors.black,
@@ -146,71 +147,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Divider(
                   color: Colors.red,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: new Padding(
-                      padding: new EdgeInsets.only(left: 8.0),
-                      child: 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Text(
-                              'Pedidos Pendientes',
-                                style: new TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.normal,
-                                ),
-                              ),  
-                            ),
-                            Row(
-                              children : [ _createSearchButton(context, 'delivery')]
-                            )
-                          ],
-                        )
-                      ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  height: 170.0,
-                  child:
-                    ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      Container(
-                        width: 300.0,
-                        //color: Colors.red,
-                        child: _pendingDelivery(),
-                        //padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        margin: EdgeInsets.only(left:10),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.blue,
-                        child: _pendingDelivery(),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.green,
-                        child: _pendingDelivery(),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.yellow,
-                        child: _pendingDelivery(),
-                      ),
-                      Container(
-                        width: 300.0,
-                        //color: Colors.orange,
-                        child: _pendingDelivery(),
-                        
-                      ),
-                    ],
-                  ),
                 ),
               ],
             )
@@ -329,7 +265,7 @@ class _HomePageState extends State<HomePage> {
 
     return Card(
       
-      color: Colors.amber.shade100,
+      color: Colors.grey.shade300,
       shadowColor: Colors.grey,
       child: Column(
         children: <Widget>[
@@ -354,7 +290,16 @@ class _HomePageState extends State<HomePage> {
               ),
               TextButton(
                 onPressed: (){
-                  Navigator.pushNamed(context, '/reception', arguments: item);
+                  Navigator.pushNamed(context, '/allocate_assign', arguments: item);
+                  /* Fluttertoast.showToast(
+                    msg: "Sin Implementar",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                  ); */
                 }, 
                 child: Text('Recepcionar')
               )
@@ -478,8 +423,6 @@ class _HomePageState extends State<HomePage> {
     if (_dte != null && _dte.data.items != null){
       _boxes = _setBoxes(_dte.data.items);    
     }   
-
-    
 
     _toggleSubmitState();
     return _boxes;
