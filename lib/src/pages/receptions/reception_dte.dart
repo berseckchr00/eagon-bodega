@@ -9,6 +9,12 @@ class ReceptionDtePage extends StatefulWidget {
   _ReceptionPageState createState() => new _ReceptionPageState();
 }
 
+class DteArguments {
+  final DteModel dteModel;
+
+  DteArguments(this.dteModel);
+}
+
 class OrderDetail {
   const OrderDetail(
       this.codigoProducto, this.cantidad, this.codigoProveedor, this.glosa);
@@ -20,24 +26,18 @@ class OrderDetail {
 
 class _ReceptionPageState extends State<ReceptionDtePage> {
   final _formKey = GlobalKey<FormState>();
-  /*final _folio = '65778';
-  final _rut = '96817490-8';*/
+  String _folio;
+  String _rut;
+  DteModel _dteModel;
   int currentStep = 0;
   bool complete = false;
   Item item;
-  OrderDetail _selectedOrder;
 
   List<Step> steps;
   Stepper stepper;
   Color _colorDetail;
 
   bool submitting = false;
-
-  void _toggleSubmitState() {
-    setState(() {
-      submitting = !submitting;
-    });
-  }
 
   @override
   void didUpdateWidget(Widget oldWidget) {
@@ -46,44 +46,49 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
 
   @override
   Widget build(BuildContext context) {
-    this.item = ModalRoute.of(context).settings.arguments;
-    List<Step> stepDummy = _createStepsDummy();
+    //this.item = ModalRoute.of(context).settings.arguments;
 
+    final args = ModalRoute.of(context).settings.arguments as DteArguments;
+    this._dteModel = args.dteModel;
+
+    if (this._dteModel != null) {
+      steps = _createSteps(context, this._dteModel, null);
+    }
+
+    this._folio = args.dteModel.data.head.dteFolio;
+    this._rut = args.dteModel.data.head.rutEmisor;
     return new Scaffold(
       appBar: AppBar(
         title: Text('Recepción'),
       ),
       body: Column(children: <Widget>[
         Expanded(
-            child: !submitting
-                ? const Center(child: const CircularProgressIndicator())
-                : Stepper(
-                    currentStep: currentStep,
-                    onStepContinue: onStepContinue,
-                    onStepTapped: (step) => onStepGoTo(step),
-                    onStepCancel: onStepCancel,
-                    controlsBuilder: (BuildContext context,
-                        {VoidCallback onStepContinue,
-                        VoidCallback onStepCancel}) {
-                      return Row(
-                        children: <Widget>[
-                          TextButton(
-                            onPressed: onStepCancel,
-                            child: Text('Anterior'),
-                          ),
-                          TextButton(
-                            onPressed: (!complete)
-                                ? onStepContinue
-                                : () {
-                                    //Navigator.pushNamed(context, '/reception_assign');
-                                  },
-                            child: Text('Siguiente'),
-                          ),
-                        ],
-                      );
-                    },
-                    steps: (steps != null) ? steps : _createStepsDummy(),
-                  ))
+            child: Stepper(
+          currentStep: currentStep,
+          onStepContinue: onStepContinue,
+          onStepTapped: (step) => onStepGoTo(step),
+          onStepCancel: onStepCancel,
+          controlsBuilder: (BuildContext context,
+              {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+            return Row(
+              children: <Widget>[
+                TextButton(
+                  onPressed: onStepCancel,
+                  child: Text('Anterior'),
+                ),
+                TextButton(
+                  onPressed: (!complete)
+                      ? onStepContinue
+                      : () {
+                          //Navigator.pushNamed(context, '/reception_assign');
+                        },
+                  child: Text('Siguiente'),
+                ),
+              ],
+            );
+          },
+          steps: (steps != null) ? steps : _createStepsDummy(),
+        ))
       ]),
     );
   }
@@ -92,24 +97,6 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   void initState() {
     super.initState();
     _colorDetail = _getColorCard(false);
-    _searchPendantReceptions(this._rut, this._folio).then((value) => {
-          //_toggleSubmitState(),
-          if (value.data.head.ref != null)
-            {
-              _searchPurchaseOrder(value.data.head.ref).then((oc_data) => {
-                    setState(() {
-                      _toggleSubmitState();
-                      steps = _createSteps(context, value, oc_data);
-                    })
-                  })
-            }
-          else
-            {
-              setState(() {
-                steps = _createSteps(context, value, null);
-              })
-            }
-        });
   }
 
   onStepContinue() {

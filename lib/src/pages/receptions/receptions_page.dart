@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:eagon_bodega/src/models/Timbre.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart';
+import 'package:eagon_bodega/src/pages/receptions/reception_dte.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -335,7 +336,11 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
             await _getDteList(_rut.text, _folio.text).then((dte) {
               if (dte.data != null) {
                 //TODO: call view DTE
-                Navigator.pushNamed(context, '/reception_dte');
+                Navigator.pushNamed(
+                  context,
+                  '/reception_dte',
+                  arguments: DteArguments(dte),
+                );
               } else {
                 Fluttertoast.showToast(
                     msg: "No se pudo encontrar el documento",
