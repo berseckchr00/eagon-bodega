@@ -9,7 +9,10 @@ import 'package:eagon_bodega/src/pages/orders_ot/orders_input_detail_page_ot.dar
 import 'package:eagon_bodega/src/pages/orders_ot/orders_input_page_ot.dart';
 import 'package:eagon_bodega/src/pages/orders_page.dart';
 import 'package:eagon_bodega/src/pages/receptions/reception_dte.dart';
+import 'package:eagon_bodega/src/pages/receptions/reception_list_page.dart';
 import 'package:eagon_bodega/src/pages/receptions/receptions_page.dart';
+
+import 'package:eagon_bodega/src/pages/bkp/reception_page.dart';
 import 'package:eagon_bodega/src/pages/receptions/reception_search.dart';
 
 import 'package:flutter/material.dart';
@@ -26,8 +29,10 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/orders_input_detail_ot': (BuildContext context) => OrderCreatePageOt(),
     '/reception': (BuildContext context) => ReceptionsPage(),
     '/reception_dte': (BuildContext context) => ReceptionDtePage(),
-    /*'/reception_assign' : (BuildContext context) => ReceptionAssignPage(),
-    '/reception_list' : (BuildContext context) => ReceptionOrderList(),
+    '/reception_test': (BuildContext context) => ReceptionPageTest(),
+    /*'/reception_assign' : (BuildContext context) => ReceptionAssignPage(),*/
+    '/reception_list': (BuildContext context) => ReceptionOrderList(),
+    /*
     '/reception_quantity' : (BuildContext context) => ReceptionQuantity(),
      */
     '/allocate': (BuildContext context) => AllocatePage(),

@@ -1,7 +1,11 @@
+import 'package:async_button_builder/async_button_builder.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart';
+import 'package:eagon_bodega/src/models/dte_model.dart' as modelDte;
 import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
+import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class ReceptionDtePage extends StatefulWidget {
@@ -13,6 +17,17 @@ class DteArguments {
   final DteModel dteModel;
 
   DteArguments(this.dteModel);
+}
+
+class OcArguments {
+  final PurchaseOrderModel ocModel;
+  OcArguments(this.ocModel);
+}
+
+class fullArguments {
+  final DteModel dteModel;
+  final PurchaseOrderModel ocModel;
+  fullArguments(this.dteModel, this.ocModel);
 }
 
 class OrderDetail {
@@ -38,6 +53,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   Color _colorDetail;
 
   bool submitting = false;
+  order.PurchaseOrderModel ocData;
 
   @override
   void didUpdateWidget(Widget oldWidget) {
@@ -57,6 +73,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
 
     this._folio = args.dteModel.data.head.dteFolio;
     this._rut = args.dteModel.data.head.rutEmisor;
+
     return new Scaffold(
       appBar: AppBar(
         title: Text('Recepción'),
@@ -65,7 +82,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
         Expanded(
             child: Stepper(
           currentStep: currentStep,
-          onStepContinue: onStepContinue,
+          onStepContinue: onStepContinue(),
           onStepTapped: (step) => onStepGoTo(step),
           onStepCancel: onStepCancel,
           controlsBuilder: (BuildContext context,
@@ -80,7 +97,19 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
                   onPressed: (!complete)
                       ? onStepContinue
                       : () {
-                          //Navigator.pushNamed(context, '/reception_assign');
+                          if (ocData == null) {
+                            Fluttertoast.showToast(
+                                msg: "Orden de Compra vacía",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          } else {
+                            Navigator.pushNamed(context, '/reception_list',
+                                arguments: fullArguments(_dteModel, ocData));
+                          }
                         },
                   child: Text('Siguiente'),
                 ),
@@ -97,6 +126,24 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   void initState() {
     super.initState();
     _colorDetail = _getColorCard(false);
+    // _searchPendantReceptions(this._rut, this._folio).then((value) => {
+    //       //_toggleSubmitState(),
+    //       if (value.data.head.ref != null)
+    //         {
+    //           _searchPurchaseOrder(value.data.head.ref).then((oc_data) => {
+    //                 setState(() {
+    //                   steps = _createSteps(context, value, oc_data);
+    //                   ocData = oc_data;
+    //                 })
+    //               })
+    //         }
+    //       else
+    //         {
+    //           setState(() {
+    //             steps = _createSteps(context, value, null);
+    //           })
+    //         }
+    //     });
   }
 
   onStepContinue() {
@@ -104,7 +151,6 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
         ? onStepGoTo(currentStep + 1)
         : setState(() {
             complete = true;
-            Navigator.pushNamed(context, '/reception_list');
           });
   }
 
@@ -127,7 +173,8 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
 
   List<Step> _createSteps(
       BuildContext context, DteModel dte, order.PurchaseOrderModel oc) {
-    Head data = dte.data.head;
+    ocData = oc;
+    modelDte.Head data = dte.data.head;
     List<Item> detail = dte.data.items;
     final f = new DateFormat('dd/MM/yyyy');
     var fchEmis = f.format(data.fchEmis);
@@ -280,15 +327,15 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
         ));
   }
 
-  Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async {
+  Future<order.PurchaseOrderModel> _searchPurchaseOrder(String numOc) async {
     ReceptionProvider reception = new ReceptionProvider();
-    order.PurchaseOrderModel _porder = await reception.getOc(num_oc);
+    order.PurchaseOrderModel _porder = await reception.getOc(numOc);
 
     return _porder;
   }
 
   void _showDeliveryDialog(BuildContext context) async {
-    String _ocNumber;
+    TextEditingController _numOc = new TextEditingController();
 
     return await showDialog(
         context: context,
@@ -301,36 +348,58 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextFormField(
+                      controller: _numOc,
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         return value.isNotEmpty ? null : "Número Inválido";
                       },
                       decoration: InputDecoration(hintText: "ex : 123456789"),
-                      onSaved: (String value) {
-                        _ocNumber = value;
-                      },
+                      onSaved: (String value) {},
                     )
                   ],
                 ),
               ),
               title: Text("Buscar Order de Compra"),
               actions: [
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: Colors.orange),
-                    onPressed: () {
-                      //_showOrderDialog(context);
-                      if (_formKey.currentState.validate()) {
-                        _formKey.currentState.save();
-                        _searchPurchaseOrder(_ocNumber).then((value) => {
+                AsyncButtonBuilder(
+                  child: Text('Buscar'),
+                  onPressed: () async {
+                    await _searchPurchaseOrder(_numOc.text)
+                        .then((value) => {
+                              ocData = value,
                               _searchPendantReceptions(this._rut, this._folio)
-                                  .then((dte) => setState(() {
-                                        steps =
-                                            _createSteps(context, dte, value);
-                                      }))
-                            });
-                      }
-                    },
-                    child: Text("Buscar"))
+                                  .then((dte) => {
+                                        Fluttertoast.showToast(
+                                            msg: "Orden OK!",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0),
+                                        //TODO: set state not completed
+                                        setState(() {
+                                          steps =
+                                              _createSteps(context, dte, value);
+                                        }),
+                                        Navigator.of(context).pop()
+                                      })
+                            })
+                        .whenComplete(() => null);
+                  },
+                  builder: (context, child, callback, _) {
+                    return TextButton(
+                      onPressed: callback,
+                      child: child,
+                    );
+                  },
+                ),
+                FlatButton(
+                    child: Text("Cancelar"),
+                    textColor: Colors.red,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
               ],
             );
           });

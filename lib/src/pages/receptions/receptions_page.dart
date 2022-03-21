@@ -331,7 +331,7 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
       ),
       actions: <Widget>[
         AsyncButtonBuilder(
-          child: Text('Búscar'),
+          child: Text('Buscar'),
           onPressed: () async {
             await _getDteList(_rut.text, _folio.text).then((dte) {
               if (dte.data != null) {
@@ -341,6 +341,12 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
                   '/reception_dte',
                   arguments: DteArguments(dte),
                 );
+
+                // Navigator.pushNamed(
+                //   context,
+                //   '/reception_test',
+                //   arguments: DteArguments(dte),
+                // );
               } else {
                 Fluttertoast.showToast(
                     msg: "No se pudo encontrar el documento",
