@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:async_button_builder/async_button_builder.dart';
+import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
 
 class ReceptionsPage extends StatefulWidget {
   ReceptionsPage({Key key}) : super(key: key);
@@ -331,16 +332,23 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
       ),
       actions: <Widget>[
         AsyncButtonBuilder(
-          child: Text('Búscar'),
+          child: Text('Buscar'),
           onPressed: () async {
-            await _getDteList(_rut.text, _folio.text).then((dte) {
+            await _getDteList(_rut.text, _folio.text).then((dte) async {
               if (dte.data != null) {
-                //TODO: call view DTE
-                Navigator.pushNamed(
-                  context,
-                  '/reception_dte',
-                  arguments: DteArguments(dte),
-                );
+                await _searchPurchaseOrder(dte.data.head.ref).then((ocRef) {
+                  Navigator.pushNamed(
+                    context,
+                    '/reception_dte',
+                    arguments: fullArguments(dte, ocRef),
+                  );
+                });
+
+                // Navigator.pushNamed(
+                //   context,
+                //   '/reception_test',
+                //   arguments: DteArguments(dte),
+                // );
               } else {
                 Fluttertoast.showToast(
                     msg: "No se pudo encontrar el documento",
@@ -375,5 +383,12 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
     DteModel _dte = await reception.getDteDetail(rutEmis, folio);
 
     return _dte;
+  }
+
+  Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async {
+    ReceptionProvider reception = new ReceptionProvider();
+    order.PurchaseOrderModel _porder = await reception.getOc(num_oc);
+
+    return _porder;
   }
 }

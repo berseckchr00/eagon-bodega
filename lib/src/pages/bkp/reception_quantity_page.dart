@@ -3,7 +3,7 @@ import 'package:cool_alert/cool_alert.dart';
 
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:eagon_bodega/src/models/reception_response.dart';
-import 'package:eagon_bodega/src/pages/bkp/reception_list_page.dart';
+import 'package:eagon_bodega/src/pages/receptions/reception_list_page.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:eagon_bodega/src/setting/notification_setting.dart';
 

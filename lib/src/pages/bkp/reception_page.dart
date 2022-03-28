@@ -1,10 +1,11 @@
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
+import 'package:eagon_bodega/src/pages/receptions/reception_dte.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ReceptionPage extends StatefulWidget {
+class ReceptionPageTest extends StatefulWidget {
   @override
   _ReceptionPageState createState() => new _ReceptionPageState();
 }
@@ -18,7 +19,7 @@ class OrderDetail {
   final String codigoProveedor;
 }
 
-class _ReceptionPageState extends State<ReceptionPage> {
+class _ReceptionPageState extends State<ReceptionPageTest> {
   final _formKey = GlobalKey<FormState>();
   final _folio = '65778';
   final _rut = '96817490-8';
@@ -46,7 +47,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
 
   @override
   Widget build(BuildContext context) {
-    this.item = ModalRoute.of(context).settings.arguments;
+    var args = ModalRoute.of(context).settings.arguments as DteArguments;
+    this.item = args.dteModel.data.items.first;
     List<Step> stepDummy = _createStepsDummy();
 
     return new Scaffold(
@@ -339,6 +341,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                   .then((dte) => setState(() {
                                         steps =
                                             _createSteps(context, dte, value);
+                                        Navigator.of(context).pop();
                                       }))
                             });
                       }
