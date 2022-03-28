@@ -130,6 +130,24 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   void initState() {
     super.initState();
     _colorDetail = _getColorCard(false);
+    // _searchPendantReceptions(this._rut, this._folio).then((value) => {
+    //       //_toggleSubmitState(),
+    //       if (value.data.head.ref != null)
+    //         {
+    //           _searchPurchaseOrder(value.data.head.ref).then((oc_data) => {
+    //                 setState(() {
+    //                   steps = _createSteps(context, value, oc_data);
+    //                   ocData = oc_data;
+    //                 })
+    //               })
+    //         }
+    //       else
+    //         {
+    //           setState(() {
+    //             steps = _createSteps(context, value, null);
+    //           })
+    //         }
+    //     });
   }
 
   onStepContinue() {
