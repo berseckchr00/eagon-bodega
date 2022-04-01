@@ -5,10 +5,12 @@ import 'dart:convert';
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
+import 'package:eagon_bodega/src/models/reception_response.dart';
 import 'package:eagon_bodega/src/pages/receptions/reception_dte.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 class ReceptionArguments {
   final String detailPurchase;
@@ -44,6 +46,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   List<int> _itemsOrder = List<int>.generate(0, (int index) => index);
   List<Detail> _itemsOrderDetail = [];
   String _ocRef;
+  DteModel _dteData;
+  PurchaseOrderModel _ocData;
 
   @override
   void initState() {
@@ -71,6 +75,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Widget build(BuildContext context) {
     final dteargs = ModalRoute.of(context).settings.arguments as fullArguments;
 
+    _dteData = dteargs.dteModel;
+    _ocData = dteargs.ocModel;
     _poolListDte(dteargs.dteModel, dteargs.ocModel);
 
     return (_itemsDetail.length > 0)
@@ -300,14 +306,46 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   void _checkList() {
-    String jsonOrder = jsonEncode(_itemsOrderDetail).toString();
-    _showMyDialogManual(context);
+    //TODO: parsear maps con solo los datos necesarios
+    Map<String, dynamic> saveData = new Map<String, dynamic>();
+
+    final f = new DateFormat('dd/MM/yyyy');
+    var fchEmis = f.format(_dteData.data.head.fchEmis);
+
+    saveData.addAll({
+      'head': {
+        'folio': _dteData.data.head.dteFolio,
+        'rut_proveedor': _dteData.data.head.rutEmisor,
+        'usuario_recepciona': '',
+        'id_dte': '',
+        'numero_oc': _dteData.data.head.ref,
+        'fecha_emision': fchEmis,
+        'usuario': 'app'
+      }
+    });
+
+    List<dynamic> detailDte = List<dynamic>();
+
+    _itemsDetail.forEach((element) {
+      var det = {
+        'codigo_proveedor': element.dscItem,
+        'glosa_proveedor': element.nmbItem,
+        'cantidad': element.qtyItem, //TODO: cantidad ingresada
+        'linea': element.nroLinDet
+      };
+      detailDte.add(det);
+    });
+
+    saveData.addAll({'detail': detailDte});
+    //saveData.addAll({'order': _itemsOrderDetail});
+    _showMyDialogManual(context, jsonEncode(saveData));
   }
 
-  Future<void> _showMyDialogManual(BuildContext context) async {
+  Future<void> _showMyDialogManual(
+      BuildContext context, String saveData) async {
     return showDialog<void>(
       context: context,
-      builder: (_) => FunkyOverlayManual(),
+      builder: (_) => FunkyOverlayManual(saveData),
     );
   }
 
@@ -402,8 +440,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 }
 
 class FunkyOverlayManual extends StatefulWidget {
+  String _saveData;
+
+  FunkyOverlayManual(String saveData) {
+    this._saveData = saveData;
+  }
+
   @override
-  State<StatefulWidget> createState() => FunkyOverlayStateManual();
+  State<StatefulWidget> createState() =>
+      FunkyOverlayStateManual(this._saveData);
 }
 
 class FunkyOverlayStateManual extends State<FunkyOverlayManual>
@@ -412,7 +457,13 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
   Animation<double> scaleAnimation;
   final TextEditingController _rut = new TextEditingController();
   final TextEditingController _folio = new TextEditingController();
+  ReceptionProvider receptionProvider = new ReceptionProvider();
 
+  String _saveData;
+
+  FunkyOverlayStateManual(String saveData) {
+    this._saveData = saveData;
+  }
   @override
   void initState() {
     super.initState();
@@ -444,7 +495,21 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
       actions: <Widget>[
         AsyncButtonBuilder(
           child: Text('Aceptar'),
-          onPressed: () async {},
+          onPressed: () async {
+            await _saveReception(this._saveData).then((value) => {
+                  Fluttertoast.showToast(
+                      msg: "Datos almacenados Correctamente!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0),
+                  setState(() {
+                    Navigator.of(context).pop();
+                  })
+                });
+          },
           builder: (context, child, callback, _) {
             return TextButton(
               onPressed: callback,
@@ -460,5 +525,11 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
             }),
       ],
     );
+  }
+
+  Future<ReceptionResponse> _saveReception(String saveData) async {
+    ReceptionResponse response =
+        await receptionProvider.saveReception(saveData);
+    return response;
   }
 }

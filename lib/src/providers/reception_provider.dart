@@ -121,7 +121,7 @@ class ReceptionProvider {
       if (!isJson(data)) return null;
 
       final validJson = jsonDecode(data);
-      return ReceptionResponse.fromJson(validJson);
+      return ReceptionResponse.fromJson(validJson['data']);
     } on Exception catch (e) {
       print(e);
       return null;

@@ -130,24 +130,6 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   void initState() {
     super.initState();
     _colorDetail = _getColorCard(false);
-    // _searchPendantReceptions(this._rut, this._folio).then((value) => {
-    //       //_toggleSubmitState(),
-    //       if (value.data.head.ref != null)
-    //         {
-    //           _searchPurchaseOrder(value.data.head.ref).then((oc_data) => {
-    //                 setState(() {
-    //                   steps = _createSteps(context, value, oc_data);
-    //                   ocData = oc_data;
-    //                 })
-    //               })
-    //         }
-    //       else
-    //         {
-    //           setState(() {
-    //             steps = _createSteps(context, value, null);
-    //           })
-    //         }
-    //     });
   }
 
   onStepContinue() {
@@ -168,13 +150,6 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
     setState(() => currentStep = step);
   }
 
-  Future<DteModel> _searchPendantReceptions(String rut, String folio) async {
-    ReceptionProvider reception = new ReceptionProvider();
-    DteModel _dte = await reception.getDteDetail(rut, folio);
-
-    return _dte;
-  }
-
   List<Step> _createSteps(
       BuildContext context, DteModel dte, order.PurchaseOrderModel oc) {
     ocData = oc;
@@ -184,7 +159,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
     var fchEmis = f.format(data.fchEmis);
     var fchEmisOc = (oc != null) ? f.format(oc.data.head.fecha) : '';
 
-    List<Step> steps = [
+    List<Step> stepper = [
       Step(
         title: const Text('Datos generales'),
         isActive: true,
@@ -230,8 +205,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
             ],
           ))
     ];
-
-    return steps;
+    return stepper;
   }
 
   List<Step> _createStepsDummy() {
@@ -270,7 +244,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
             initialValue: value,
             keyboardType: TextInputType.multiline,
             maxLines: null,
-          );
+            key: Key(label));
   }
 
   List<Widget> _createDetail(
@@ -370,26 +344,38 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
                   onPressed: () async {
                     await _searchPurchaseOrder(_numOc.text)
                         .then((value) => {
-                              ocData = value,
-                              _searchPendantReceptions(this._rut, this._folio)
-                                  .then((dte) => {
-                                        Fluttertoast.showToast(
-                                            msg: "Orden OK!",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.BOTTOM,
-                                            timeInSecForIosWeb: 1,
-                                            backgroundColor: Colors.red,
-                                            textColor: Colors.white,
-                                            fontSize: 16.0),
-                                        //TODO: set state not completed
-                                        setState(() {
-                                          steps =
-                                              _createSteps(context, dte, value);
-                                        }),
-                                        Navigator.of(context).pop()
-                                      })
+                              if (value != null)
+                                {
+                                  setState(() {
+                                    steps = _createSteps(
+                                        context, this._dteModel, value);
+                                    ocData = value;
+                                  }),
+                                  Navigator.of(context).pop(),
+                                  Fluttertoast.showToast(
+                                      msg: "Orden OK!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 5,
+                                      backgroundColor: Colors.grey,
+                                      textColor: Colors.red,
+                                      fontSize: 16.0)
+                                }
+                              else
+                                {
+                                  Fluttertoast.showToast(
+                                      msg: "No se Encontró OC",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 5,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0),
+                                },
                             })
-                        .whenComplete(() => null);
+                        .whenComplete(
+                          () => setState(() {}),
+                        );
                   },
                   builder: (context, child, callback, _) {
                     return TextButton(
