@@ -157,6 +157,11 @@ class FunkyOverlayState extends State<FunkyOverlay>
           contentPadding: EdgeInsets.all(20.0),
           isDense: true,
         ),
+        onChanged: (value) {
+          timbre = _parseXML2Json(value);
+          _otNumber.text =
+              'Folio : ' + timbre.ted.dd.f + ' Rut: ' + timbre.ted.dd.re;
+        },
         validator: (value) {
           if (value.isEmpty) {
             return 'Error al Leer';
@@ -165,6 +170,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
         },
         onFieldSubmitted: (String value) {
           timbre = _parseXML2Json(value);
+          _otNumber.text = 'Folio : ' + timbre.ted.dd.f;
           if (timbre == null) {
             Fluttertoast.showToast(
                 msg: "Click en Validar!",
@@ -222,6 +228,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
       value = value
           .replaceFirst(
               '<TED xmlns="http://www.sii.cl/SiiDte"version="1.0">', '<TED>')
+          .replaceFirst('<TED >', '<TED>')
           .replaceFirst('http://www.sii.cl/SiiDteversion="1.0>', '<TED>')
           .replaceFirst("version=\"1.0\"", "")
           .replaceFirst("version=\"1.0", "")
@@ -240,6 +247,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
 
       return Timbre.fromJson(tmbr);
     } catch (ex) {
+      print(ex);
       return null;
     }
   }
