@@ -78,6 +78,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
     return new Scaffold(
       appBar: AppBar(
         title: Text('Recepción'),
+        backgroundColor: Colors.grey,
       ),
       body: Column(children: <Widget>[
         Expanded(
@@ -163,6 +164,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
       Step(
         title: const Text('Datos generales'),
         isActive: true,
+        subtitle: Text('Encabezado Guía Despacho'),
         state: StepState.complete,
         content: Column(
           children: <Widget>[
@@ -176,11 +178,13 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
       ),
       Step(
           title: const Text('Detalle documento'),
+          subtitle: Text('Lineas a recepcionar'),
           isActive: true,
           state: StepState.complete,
           content: Column(children: _createDetail(context, detail, oc))),
       Step(
           title: const Text('Datos OC'),
+          subtitle: Text('Información Orden de Compra'),
           isActive: true,
           state: StepState.complete,
           content: Column(

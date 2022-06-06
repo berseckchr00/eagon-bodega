@@ -24,6 +24,7 @@ class _ReceptionsPageState extends State<ReceptionsPage> {
         appBar: AppBar(
           leading: Container(),
           title: Text("Ingreso", style: TextStyle(fontSize: 18)),
+          backgroundColor: Colors.orange,
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -159,8 +160,22 @@ class FunkyOverlayState extends State<FunkyOverlay>
         ),
         onChanged: (value) {
           timbre = _parseXML2Json(value);
-          _otNumber.text =
-              'Folio : ' + timbre.ted.dd.f + ' Rut: ' + timbre.ted.dd.re;
+          if (timbre == null) {
+            Fluttertoast.showToast(
+                msg: "No se pudo leer el código, realizar ingreso manual",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+            Navigator.of(context).pop();
+
+            _otNumber.text = '';
+          } else {
+            _otNumber.text =
+                'Folio : ' + timbre.ted.dd.f + ' Rut: ' + timbre.ted.dd.re;
+          }
         },
         validator: (value) {
           if (value.isEmpty) {
@@ -173,13 +188,16 @@ class FunkyOverlayState extends State<FunkyOverlay>
           _otNumber.text = 'Folio : ' + timbre.ted.dd.f;
           if (timbre == null) {
             Fluttertoast.showToast(
-                msg: "Click en Validar!",
+                msg: "No se pudo leer el código, realizar ingreso manual",
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.CENTER,
                 timeInSecForIosWeb: 1,
                 backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
+            Navigator.of(context).pop();
+
+            _otNumber.text = '';
           }
         },
       ),
@@ -190,13 +208,16 @@ class FunkyOverlayState extends State<FunkyOverlay>
             timbre = _parseXML2Json(_otNumber.text);
             if (timbre == null) {
               Fluttertoast.showToast(
-                  msg: "No se pudo leer el código",
+                  msg: "No se pudo leer el código, realizar ingreso manual",
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.CENTER,
                   timeInSecForIosWeb: 1,
                   backgroundColor: Colors.red,
                   textColor: Colors.white,
                   fontSize: 16.0);
+              Navigator.of(context).pop();
+
+              _otNumber.text = '';
             } else {
               await _getDteList(timbre).then((dte) {
                 if (dte.data != null) {

@@ -111,6 +111,8 @@ class ReceptionProvider {
     };
     Map<String, String> queryParameters = {"data": jsonData};
 
+    print(jsonData);
+
     var data;
     try {
       final resp =

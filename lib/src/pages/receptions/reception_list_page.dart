@@ -1,12 +1,12 @@
 /// Flutter code sample for ReorderableListView
 
 import 'dart:convert';
-
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:eagon_bodega/src/models/reception_response.dart';
 import 'package:eagon_bodega/src/pages/receptions/reception_dte.dart';
+import 'package:eagon_bodega/src/pages/receptions/resume/reception_resumen.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,26 +20,17 @@ class ReceptionArguments {
 }
 
 /// This is the main application widget.
-class ReceptionOrderList extends StatelessWidget {
-  static const String _title = 'Asignación Detalles';
+class ReceptionOrderList extends StatefulWidget {
+  ReceptionOrderList({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(_title)),
-      body: MyStatefulWidget(),
-    );
+  _ReceptionOrderState createState() {
+    return _ReceptionOrderState();
   }
 }
 
-/// This is the stateful widget that the main application instantiates.
-class MyStatefulWidget extends StatefulWidget {
-  @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
-}
-
-/// This is the private State class that goes with MyStatefulWidget.
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+// This is the private State class that goes with MyStatefulWidget.
+class _ReceptionOrderState extends State<ReceptionOrderList> {
   List<int> _items = [];
   List<Item> _itemsDetail = [];
   //List<int> _itemsOrder = [];
@@ -50,91 +41,62 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   PurchaseOrderModel _ocData;
 
   @override
-  void initState() {
-    //TODO: detail with params
-
-    // _searchPendantReceptions(this._rut, this._folio).then((value) => {
-    //       _ocRef = value.data.head.ref,
-    //       _searchPurchaseOrder(_ocRef).then((ocData) => {
-    //             setState(() {
-    //               _itemsDetail = value.data.items;
-    //               _items = List<int>.generate(
-    //                   _itemsDetail.length, (int index) => index);
-
-    //               _itemsOrderDetail = ocData.data.details;
-    //               _itemsOrder = List<int>.generate(
-    //                   _itemsOrderDetail.length, (int index) => index);
-    //             })
-    //           })
-    //     });
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    String _title = 'Asignación Detalles';
     final dteargs = ModalRoute.of(context).settings.arguments as fullArguments;
 
     _dteData = dteargs.dteModel;
     _ocData = dteargs.ocModel;
     _poolListDte(dteargs.dteModel, dteargs.ocModel);
 
-    return (_itemsDetail.length > 0)
-        ? Column(
-            children: [
-              Row(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(_title),
+          backgroundColor: Colors.orange,
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.orange),
+              onPressed: () {
+                _checkList();
+              },
+              child: Text("Guardar"),
+            ),
+          ],
+        ),
+        body: (_itemsDetail.length > 0)
+            ? Column(
                 children: [
-                  Expanded(
-                      child: ListTile(
-                    title: Text(
-                      "Detalle Recepción",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  )),
-                  Expanded(
-                      child: ListTile(
-                    title: Text(
-                      "Detalle Order Compra",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  )),
-                ],
-              ),
-              Expanded(child: _createList() // lista detalle
+                  Row(
+                    children: [
+                      Expanded(
+                          child: ListTile(
+                        title: Text(
+                          "Detalle Recepción",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      )),
+                      Expanded(
+                          child: ListTile(
+                        title: Text(
+                          "Detalle Order Compra",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      )),
+                    ],
                   ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: Colors.orange),
-                    onPressed: () {
-                      _checkList();
-                      /*Fluttertoast.showToast(
-                    msg: "Not Implemented yet!",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.orange,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                  );*/
-                    },
-                    child: Text("Guardar"),
-                  )
+                  Expanded(child: _createList()),
                 ],
               )
-            ],
-          )
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [CircularProgressIndicator()])
-              ]);
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [CircularProgressIndicator()])
+                  ]));
   }
 
   void _poolListDte(DteModel _dte, PurchaseOrderModel _porder) {
@@ -181,6 +143,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                           ),
                           Expanded(
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
                               initialValue:
                                   double.parse(_itemsDetail[index].qtyItem)
                                       .toString(),
@@ -217,9 +180,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                   newIndex -= 1;
                 }
                 final int item = _items.removeAt(oldIndex);
-                final Item det = _itemsDetail.removeAt(oldIndex);
+                final Detail det = _itemsOrderDetail.removeAt(oldIndex);
                 _items.insert(newIndex, item);
-                _itemsDetail.insert(newIndex, det);
+                _itemsOrderDetail.insert(newIndex, det);
               });
             },
           ),
@@ -247,27 +210,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                             style: TextStyle(fontSize: 16),
                           ),
                           Expanded(
-                            child: TextFormField(
-                              initialValue: (_itemsOrderDetail.length > 0)
-                                  ? _itemsOrderDetail[index].cantidad
-                                  : '',
-                              style: TextStyle(fontSize: 16.0),
-                              readOnly: true,
-                              textAlign: TextAlign.center,
-                              validator: (value) {
-                                if (value.isEmpty || double.parse(value) < 1) {
-                                  return 'Cantidad Invalida';
-                                }
-                                return null;
-                              },
-                              onSaved: (String value) {
-                                print(value);
-                                _itemsOrderDetail[index].cantidad = value;
-                              },
-                              onChanged: (String value) {
-                                _itemsOrderDetail[index].cantidad = value;
-                              },
-                            ),
+                            child: Text((_itemsOrderDetail.length > 0)
+                                ? double.parse(
+                                        _itemsOrderDetail[index].cantidad)
+                                    .toStringAsFixed(1)
+                                : ''),
                           ),
                           Text(
                             ' ${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].unidadIngreso : ''}',
@@ -291,6 +238,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 newIndex -= 1;
               }
               final int item = _itemsOrder.removeAt(oldIndex);
+              print(item);
+
               final Detail det = _itemsOrderDetail.removeAt(oldIndex);
 
               _itemsOrder.insert(newIndex, item);
@@ -325,15 +274,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     });
 
     List<dynamic> detailDte = List<dynamic>();
-
+    var ocDet = _itemsOrderDetail.asMap();
+    var inxDet = 0;
     _itemsDetail.forEach((element) {
       var det = {
-        'codigo_proveedor': element.dscItem,
+        'codigo_proveedor': element.vlrCodigo,
         'glosa_proveedor': element.nmbItem,
         'cantidad': element.qtyItem, //TODO: cantidad ingresada
-        'linea': element.nroLinDet
+        'linea': element.nroLinDet,
+        'oc_codigo': ocDet[inxDet].codigoProducto,
+        'oc_glosa': ocDet[inxDet].glosa
       };
       detailDte.add(det);
+      inxDet++;
     });
 
     saveData.addAll({'detail': detailDte});
@@ -497,17 +450,37 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
           child: Text('Aceptar'),
           onPressed: () async {
             await _saveReception(this._saveData).then((value) => {
-                  Fluttertoast.showToast(
-                      msg: "Datos almacenados Correctamente!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0),
-                  setState(() {
-                    Navigator.of(context).pop();
-                  })
+                  if (value != null)
+                    {
+                      Fluttertoast.showToast(
+                          msg: "Datos almacenados Correctamente!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.green,
+                          textColor: Colors.white,
+                          fontSize: 16.0),
+                      setState(() {
+                        Navigator.of(context).pop();
+
+                        Navigator.pushNamed(context, '/reception_resumen',
+                            arguments: fullArgumentsResumen(this._saveData));
+                      }),
+                    }
+                  else
+                    {
+                      Fluttertoast.showToast(
+                          msg: "Error al guardar datos!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0),
+                      setState(() {
+                        Navigator.of(context).pop();
+                      }),
+                    }
                 });
           },
           builder: (context, child, callback, _) {
