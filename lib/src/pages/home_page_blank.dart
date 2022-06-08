@@ -31,17 +31,17 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     //if(prefs.ciSession != null) Navigator.pushNamed(context, '/login');
-    _loadPendantReceptions().then((value) => setState(() {
-          _cardReception = value;
-        }));
+    // _loadPendantReceptions().then((value) => setState(() {
+    //       _cardReception = value;
+    //     }));
   }
 
   @override
   void didUpdateWidget(Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _loadPendantReceptions().then((value) => setState(() {
-          _cardReception = value;
-        }));
+    // _loadPendantReceptions().then((value) => setState(() {
+    //       _cardReception = value;
+    //     }));
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
+import 'package:dart_rut_validator/dart_rut_validator.dart';
 
 class ReceptionsPage extends StatefulWidget {
   ReceptionsPage({Key key}) : super(key: key);
@@ -147,6 +148,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
   }
 
   Widget _buildAlertDialog() {
+    var rut_timbre = null;
     return AlertDialog(
       title: Text('Lector de Barra'),
       content: TextFormField(
@@ -173,6 +175,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
 
             _otNumber.text = '';
           } else {
+            rut_timbre = timbre.ted.dd.re;
             _otNumber.text =
                 'Folio : ' + timbre.ted.dd.f + ' Rut: ' + timbre.ted.dd.re;
           }
@@ -184,7 +187,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
           return null;
         },
         onFieldSubmitted: (String value) {
-          timbre = _parseXML2Json(value);
+          //timbre = _parseXML2Json(value);
           _otNumber.text = 'Folio : ' + timbre.ted.dd.f;
           if (timbre == null) {
             Fluttertoast.showToast(
@@ -205,7 +208,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
         AsyncButtonBuilder(
           child: Text('Validar'),
           onPressed: () async {
-            timbre = _parseXML2Json(_otNumber.text);
+            //timbre = _parseXML2Json(_otNumber.text);
             if (timbre == null) {
               Fluttertoast.showToast(
                   msg: "No se pudo leer el código, realizar ingreso manual",
@@ -219,10 +222,15 @@ class FunkyOverlayState extends State<FunkyOverlay>
 
               _otNumber.text = '';
             } else {
-              await _getDteList(timbre).then((dte) {
+              await _getDteList(timbre).then((dte) async {
                 if (dte.data != null) {
-                  //TODO: call view DTE
-                  Navigator.pushNamed(context, '/reception_dte');
+                  await _searchPurchaseOrder(dte.data.head.ref).then((ocRef) {
+                    Navigator.pushNamed(
+                      context,
+                      '/reception_dte',
+                      arguments: fullArguments(dte, ocRef),
+                    );
+                  });
                 }
               });
             }
@@ -246,6 +254,8 @@ class FunkyOverlayState extends State<FunkyOverlay>
 
   Timbre _parseXML2Json(String value) {
     try {
+      print(value);
+
       value = value
           .replaceFirst(
               '<TED xmlns="http://www.sii.cl/SiiDte"version="1.0">', '<TED>')
@@ -282,6 +292,13 @@ class FunkyOverlayState extends State<FunkyOverlay>
 
     return _dte;
   }
+
+  Future<order.PurchaseOrderModel> _searchPurchaseOrder(String num_oc) async {
+    ReceptionProvider reception = new ReceptionProvider();
+    order.PurchaseOrderModel _porder = await reception.getOc(num_oc);
+
+    return _porder;
+  }
 }
 
 class FunkyOverlayStateManual extends State<FunkyOverlayManual>
@@ -313,6 +330,10 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
     return _buildAlertDialog();
   }
 
+  void onChangedApplyFormat(String text) {
+    RUTValidator.formatFromTextController(_rut);
+  }
+
   Widget _buildAlertDialog() {
     return AlertDialog(
       title: Text('Búsqueda Manual'),
@@ -328,6 +349,7 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
               contentPadding: EdgeInsets.all(20.0),
               isDense: true,
             ),
+            onChanged: onChangedApplyFormat,
             validator: (value) {
               if (value.isEmpty) {
                 return 'Error al Leer';
@@ -363,7 +385,8 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
         AsyncButtonBuilder(
           child: Text('Buscar'),
           onPressed: () async {
-            await _getDteList(_rut.text, _folio.text).then((dte) async {
+            await _getDteList(_rut.text.replaceAll(".", ""), _folio.text)
+                .then((dte) async {
               if (dte.data != null) {
                 await _searchPurchaseOrder(dte.data.head.ref).then((ocRef) {
                   Navigator.pushNamed(
