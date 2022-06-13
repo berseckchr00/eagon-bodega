@@ -24,6 +24,7 @@ class _ReceptionResumenState extends State<ReceptionResumen> {
     print(jsonDecode(_reception));
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         title: Text('Resumen Recepción'),
         backgroundColor: Colors.orange,
         actions: [
@@ -45,6 +46,15 @@ class _ReceptionResumenState extends State<ReceptionResumen> {
     return Container(
         child: Column(children: [
       Center(child: _createHead(_list[0])),
+      Center(
+          child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: EdgeInsets.only(left: 15, right: 15),
+        child: ListTile(
+          contentPadding: EdgeInsets.fromLTRB(15, 10, 25, 0),
+          title: Text('Detalle guía'),
+        ),
+      )),
       new Expanded(child: _createDetailBody(_list[1])),
     ]));
   }
@@ -58,16 +68,21 @@ class _ReceptionResumenState extends State<ReceptionResumen> {
       child: Column(
         children: <Widget>[
           ListTile(
-            contentPadding: EdgeInsets.fromLTRB(15, 10, 25, 0),
+            contentPadding: EdgeInsets.fromLTRB(15, 10, 25, 15),
             title: Text('Datos Documento'),
-            subtitle: Text('Folio : ' +
-                _list[0] +
-                '\nFecha Emisión : ' +
-                _list[5] +
-                '\nRut Proveedor :' +
-                _list[1] +
-                ' \nNúmero OC : ' +
-                _list[2]),
+            subtitle: Text(
+              'Folio : ' +
+                  _list[0] +
+                  '\nFecha Emisión : ' +
+                  _list[5] +
+                  '\nRut Proveedor :' +
+                  _list[1] +
+                  ' \nNúmero OC : ' +
+                  _list[4],
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
             leading: Icon(Icons.home),
           )
         ],
@@ -81,21 +96,36 @@ class _ReceptionResumenState extends State<ReceptionResumen> {
       itemBuilder: (BuildContext context, int index) {
         Map<String, dynamic> line = data[index];
         var l = line.values.toList();
-        return new Column(
-          children: <Widget>[
-            new ListTile(
-              title: new Text('Producto ' + (index + 1).toString()),
-              subtitle: new Text(line['glosa_proveedor'] +
-                  '\ncantidad: ' +
-                  line['cantidad'] +
-                  '\ncodigo oc:' +
-                  line['oc_glosa']),
-            ),
-            new Divider(
-              height: 2.0,
-            ),
-          ],
-        );
+        return new Column(children: <Widget>[
+          Card(
+              color: Colors.orange.shade50,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: Column(
+                children: [
+                  new ListTile(
+                    contentPadding: EdgeInsets.fromLTRB(15, 10, 25, 15),
+                    title: new Text(
+                      'Linea ' + (index + 1).toString(),
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    subtitle: new Text(
+                      line['glosa_proveedor'] +
+                          '\ncantidad: ' +
+                          line['cantidad'] +
+                          '\ncodigo oc:' +
+                          line['oc_glosa'],
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  new Divider(
+                    height: 2.0,
+                  ),
+                ],
+              ))
+        ]);
       },
     );
   }
