@@ -19,6 +19,14 @@ class DteArguments {
   DteArguments(this.dteModel);
 }
 
+class orderPurchaseClass {
+  String numero;
+  String fecha;
+  String porcentajeAsignado;
+
+  orderPurchaseClass(this.numero, this.fecha, this.porcentajeAsignado);
+}
+
 class OcArguments {
   final PurchaseOrderModel ocModel;
   OcArguments(this.ocModel);
@@ -56,6 +64,13 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
   bool submitting = false;
   order.PurchaseOrderModel ocData;
 
+  List<orderPurchaseClass> lstOrderPurchase = [
+    orderPurchaseClass('000332445', '01-06-2022', '100%'),
+    orderPurchaseClass('000310092', '05-04-2022', '34.9%'),
+    orderPurchaseClass('000332', '21-06-2022', '80.5%'),
+    orderPurchaseClass('100332444', '10-01-2022', '21.00%')
+  ];
+
   @override
   void didUpdateWidget(Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -90,6 +105,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
           controlsBuilder: (BuildContext context,
               {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
             return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 TextButton(
                   onPressed: onStepCancel,
@@ -122,7 +138,7 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
             );
           },
           steps: (steps != null) ? steps : _createStepsDummy(),
-        ))
+        )),
       ]),
     );
   }
@@ -187,29 +203,84 @@ class _ReceptionPageState extends State<ReceptionDtePage> {
           subtitle: Text('Información Orden de Compra'),
           isActive: true,
           state: StepState.complete,
-          content: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        _showDeliveryDialog(context);
-                      },
-                      child: Icon(Icons.search)),
-                ],
-              ),
-              _createTextStep(
-                  'Numero', (oc != null) ? oc.data.head.numero : '', true),
-              _createTextStep('Fecha', (oc != null) ? fchEmisOc : '', true),
-              _createTextStep(
-                  'Porcentaje Asignado',
-                  (oc != null) ? oc.data.head.porcentajeAsignado + ' %' : '0 %',
-                  true),
-            ],
-          ))
+          content: //_buildTable(),
+              SizedBox(
+                  height: 500,
+                  child: Column(
+                    children: <Widget>[
+                      _buildTable()
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   children: [
+                      //     ElevatedButton(
+                      //         onPressed: () {
+                      //           _showDeliveryDialog(context);
+                      //         },
+                      //         child: Icon(Icons.search)),
+                      //   ],
+                      // ),
+                      // _createTextStep(
+                      //     'Numero', (oc != null) ? oc.data.head.numero : '', true),
+                      // _createTextStep('Fecha', (oc != null) ? fchEmisOc : '', true),
+                      // _createTextStep(
+                      //     'Porcentaje Asignado',
+                      //     (oc != null) ? oc.data.head.porcentajeAsignado + ' %' : '0 %',
+                      //     true),
+                    ],
+                  )))
     ];
     return stepper;
+  }
+
+  Widget _buildTable() {
+    return Expanded(
+        flex: 1,
+        child: ListView.builder(
+          itemCount: lstOrderPurchase.length,
+          itemBuilder: (BuildContext ctx, index) {
+            // Display the list item
+            return Dismissible(
+              key: UniqueKey(),
+
+              // only allows the user swipe from right to left
+              direction: DismissDirection.endToStart,
+
+              // Remove this product from the list
+              // In production enviroment, you may want to send some request to delete it on server side
+              onDismissed: (_) {
+                setState(() {
+                  lstOrderPurchase.removeAt(index);
+                });
+              },
+
+              // Display item's title, price...
+              child: Card(
+                //margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 0),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    child: Text(lstOrderPurchase[index].numero.toString()),
+                  ),
+                  title: Text(lstOrderPurchase[index].fecha),
+                  subtitle: Text(
+                      "\$${lstOrderPurchase[index].porcentajeAsignado.toString()}"),
+                  trailing: const Icon(Icons.arrow_back),
+                ),
+              ),
+
+              // This will show up when the user performs dismissal action
+              // It is a red background and a trash icon
+              background: Container(
+                color: Colors.red,
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                alignment: Alignment.centerRight,
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.black,
+                ),
+              ),
+            );
+          },
+        ));
   }
 
   List<Step> _createStepsDummy() {
