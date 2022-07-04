@@ -286,9 +286,10 @@ class FunkyOverlayState extends State<FunkyOverlay>
   Future<DteModel> _getDteList(Timbre timbre) async {
     var folio = timbre.ted.dd.f;
     var rutEmis = timbre.ted.dd.re;
+    var tipoDoc = int.parse(timbre.ted.dd.td);
 
     ReceptionProvider reception = new ReceptionProvider();
-    DteModel _dte = await reception.getDteDetail(rutEmis, folio);
+    DteModel _dte = await reception.getDteDetail(rutEmis, folio, tipoDoc);
 
     return _dte;
   }
@@ -334,12 +335,44 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
     RUTValidator.formatFromTextController(_rut);
   }
 
+  int _defaultDoc = null;
+
   Widget _buildAlertDialog() {
+    const Map<String, int> docsOptions = {
+      "Guía Despacho": 52,
+      "Factura Electrónica": 33
+    };
+
     return AlertDialog(
       title: Text('Búsqueda Manual'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          new Container(
+              padding: EdgeInsets.zero,
+              child: new DropdownButton<int>(
+                hint: Text("Selecciona un valor"),
+                items: docsOptions
+                    .map((description, value) {
+                      return MapEntry(
+                          description,
+                          DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(description),
+                          ));
+                    })
+                    .values
+                    .toList(),
+                value: _defaultDoc,
+                onChanged: (int newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      print(newValue);
+                      _defaultDoc = newValue;
+                    });
+                  }
+                },
+              )),
           TextFormField(
             keyboardType: TextInputType.text,
             style: TextStyle(color: Colors.black, fontSize: 16.0),
@@ -365,7 +398,7 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
             style: TextStyle(color: Colors.black, fontSize: 16.0),
             controller: _folio,
             decoration: const InputDecoration(
-              hintText: 'Número guía: ...',
+              hintText: 'Número documento: ...',
               contentPadding: EdgeInsets.all(20.0),
               isDense: true,
             ),
@@ -385,7 +418,8 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
         AsyncButtonBuilder(
           child: Text('Buscar'),
           onPressed: () async {
-            await _getDteList(_rut.text.replaceAll(".", ""), _folio.text)
+            await _getDteList(
+                    _rut.text.replaceAll(".", ""), _folio.text, _defaultDoc)
                 .then((dte) async {
               if (dte.data != null) {
                 await _searchPurchaseOrder(dte.data.head.ref).then((ocRef) {
@@ -430,9 +464,9 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
     );
   }
 
-  Future<DteModel> _getDteList(rutEmis, folio) async {
+  Future<DteModel> _getDteList(rutEmis, folio, tipoDoc) async {
     ReceptionProvider reception = new ReceptionProvider();
-    DteModel _dte = await reception.getDteDetail(rutEmis, folio);
+    DteModel _dte = await reception.getDteDetail(rutEmis, folio, tipoDoc);
 
     return _dte;
   }

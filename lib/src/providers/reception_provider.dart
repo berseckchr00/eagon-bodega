@@ -36,8 +36,9 @@ class ReceptionProvider {
     }
   }
 
-  Future<DteModel> getDteDetail(String rut, String folio) async {
-    var uri = Uri.parse('$_url/reception.php/getDteDetail/$rut/$folio');
+  Future<DteModel> getDteDetail(String rut, String folio, int tipoDoc) async {
+    var uri =
+        Uri.parse('$_url/reception.php/getDteDetail/$rut/$folio/$tipoDoc');
     Map<String, String> headers = {
       "content-type": "application/x-www-form-urlencoded",
       'Authorization': EnviromentConfig().getApiKey(),

@@ -304,7 +304,7 @@ class _ReceptionOrderState extends State<ReceptionOrderList> {
 
   Future<DteModel> _searchPendantReceptions(String rut, String folio) async {
     ReceptionProvider reception = new ReceptionProvider();
-    DteModel _dte = await reception.getDteDetail(rut, folio);
+    DteModel _dte = await reception.getDteDetail(rut, folio, 52);
     return _dte;
   }
 

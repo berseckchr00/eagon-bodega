@@ -333,7 +333,7 @@ class _HomePageState extends State<HomePage> {
       String rut, String folio) async {
     _toggleSubmitState();
     ReceptionProvider reception = new ReceptionProvider();
-    DteModel _dte = await reception.getDteDetail(rut, folio);
+    DteModel _dte = await reception.getDteDetail(rut, folio, 52);
     List<Widget> _boxes;
     List<Item> items = [];
 
