@@ -112,10 +112,15 @@ class _ReceptionResumenState extends State<ReceptionResumen> {
                       style: TextStyle(fontSize: 12),
                     ),
                     subtitle: new Text(
-                      line['glosa_proveedor'] +
+                      'codigo doc: ' +
+                          line['codigo_proveedor'] +
+                          '\n' +
+                          line['glosa_proveedor'] +
                           '\ncantidad: ' +
                           line['cantidad'] +
-                          '\ncodigo oc:' +
+                          '\ncodigo oc: ' +
+                          line['oc_codigo'] +
+                          '\n' +
                           line['oc_glosa'],
                       style: TextStyle(fontSize: 16),
                     ),

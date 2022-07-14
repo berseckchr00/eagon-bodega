@@ -49,6 +49,7 @@ class ReceptionProvider {
     try {
       final resp = await http.get(uri, headers: headers);
       data = Utf8Codec().decode(resp.bodyBytes);
+      print(data);
       final dte = DteModel.fromJson(jsonDecode(data));
       return dte;
       //List<Dte> lstDte = new

@@ -1,3 +1,6 @@
+import 'package:eagon_bodega/src/pages/allocation/allocation_dte.dart';
+import 'package:eagon_bodega/src/pages/allocation/allocation_list_page.dart';
+import 'package:eagon_bodega/src/pages/allocation/allocaton_page.dart';
 import 'package:eagon_bodega/src/pages/home_page_blank.dart';
 import 'package:eagon_bodega/src/pages/login_page.dart';
 import 'package:eagon_bodega/src/pages/orders/orders_input_detail_page.dart';
@@ -36,5 +39,8 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/reception_search': (BuildContext context) => ReceptionPage(),
     //'/alert' : (BuildContext context) => StatefulDialog(),
     //'/login' : (BuildContext context) => LoginPage(),
+    '/allocate': (BuildContext context) => AllocationPage(),
+    '/allocation_dte': (BuildContext context) => AllocationDtePage(),
+    '/allocation_list': (BuildContext context) => AllocationOrderList(),
   };
 }
