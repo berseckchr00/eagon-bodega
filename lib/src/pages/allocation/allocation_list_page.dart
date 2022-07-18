@@ -73,14 +73,6 @@ class _AllocationOrderState extends State<AllocationOrderList> {
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       )),
-                      Expanded(
-                          child: ListTile(
-                        title: Text(
-                          "Ubicación",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      )),
                     ],
                   ),
                   Expanded(child: _createList()),
@@ -107,94 +99,232 @@ class _AllocationOrderState extends State<AllocationOrderList> {
     }
   }
 
-  Widget _createList() {
-    Color oddItemColorDetail = Colors.orange[800]
-        .withOpacity(0.05); //colorScheme.primary.withOpacity(0.05);
-    final Color oddItemColor = Colors.orange[800]
-        .withOpacity(0.05); //colorScheme.primary.withOpacity(0.05);
-    Color evenItemColorDetail = Colors.orange[400].withOpacity(0.15);
-    final Color evenItemColor = Colors.orange[400].withOpacity(0.15);
+  int _defaultWarehouse = null;
+  int _defaultWarehouseAreas = null;
+  int _defaultWarehouseAreasStreets = null;
+  int _defaultWarehouseAreasStreetsSide = null;
+  int _defaultWarehouseAreasLocation = null;
 
-    return Row(
-      children: [
-        Expanded(
-          child: ReorderableListView(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            children: <Widget>[
-              for (int index = 0; index < _items.length; index++)
-                //_generateItemList(_itemsDetail[index], index)
-                Column(
-                  key: Key('$index'),
-                  children: [
-                    ListTile(
-                      minVerticalPadding: 10,
-                      tileColor: _items[index].isOdd
-                          ? oddItemColorDetail
-                          : evenItemColorDetail,
-                      title: Text('${_itemsDetail[index].nmbItem}'),
-                      subtitle: Row(
+  Widget _createList() {
+    Color oddItemColorDetail = Colors.orange[200];
+    Color evenItemColorDetail = Colors.grey[200];
+
+    const Map<String, int> warehouse = {
+      "AGENTAL": 1,
+      "TRACONTAL": 2,
+      "BODEGA DE PRUEBA": 9
+    };
+
+    const Map<String, int> warehouseAreas = {
+      "ZONA A": 1,
+      "ZONA EXTRA": 3,
+      "ENCARPADO": 6
+    };
+
+    const Map<String, int> warehouseAreasStreets = {
+      "CALLE 1": 1,
+      "CALLE 2": 2,
+      "CALLE 10": 10
+    };
+
+    const Map<String, int> warehouseAreasSide = {"LADO A": 0, "LADO B": 1};
+
+    const Map<String, int> warehouseAreasLocation = {
+      "0_0_1": 308,
+      "0_1_1": 309,
+      "1_1_1": 311
+    };
+
+    return Row(children: [
+      Expanded(
+          child: ListView(children: [
+        for (int index = 0; index < _items.length; index++)
+          //_generateItemList(_itemsDetail[index], index)
+          Column(
+            key: Key('$index'),
+            children: [
+              Card(
+                borderOnForeground: true,
+                color: _items[index].isOdd
+                    ? oddItemColorDetail
+                    : evenItemColorDetail,
+                child: Row(children: [
+                  Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Cant.: ',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Expanded(
-                            child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              initialValue:
-                                  double.parse(_itemsDetail[index].qtyItem)
-                                      .toString(),
-                              style: TextStyle(fontSize: 14.0),
-                              //readOnly: true,
-                              textAlign: TextAlign.center,
-                              validator: (value) {
-                                if (value.isEmpty || double.parse(value) < 1) {
-                                  return 'Cantidad Invalida';
-                                }
-                                return null;
-                              },
-                              onSaved: (String value) {
-                                print(value);
-                              },
-                            ),
-                          ),
-                          Text(
-                            ' ${_itemsDetail[index].unmdItem}',
-                            style: TextStyle(fontSize: 16),
+                          SizedBox(
+                              width: 200,
+                              child: Text('${_itemsDetail[index].nmbItem}')),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Cant.: ',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              SizedBox(
+                                width: 50.0,
+                                child: TextFormField(
+                                    initialValue: double.parse(
+                                            _itemsDetail[index].qtyItem)
+                                        .toString(),
+                                    style: TextStyle(fontSize: 14.0),
+                                    readOnly: true,
+                                    textAlign: TextAlign.left),
+                              ),
+                              Text(
+                                ' ${_itemsDetail[index].unmdItem}',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
+                      )),
+                  Padding(
+                    padding: EdgeInsets.all(0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.zero,
+                            child: new DropdownButton<int>(
+                              hint: Text("Selecciona un valor"),
+                              items: warehouse
+                                  .map((description, value) {
+                                    return MapEntry(
+                                        description,
+                                        DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(description),
+                                        ));
+                                  })
+                                  .values
+                                  .toList(),
+                              value: _defaultWarehouse,
+                              onChanged: (int newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    print(newValue);
+                                    _defaultWarehouse = newValue;
+                                  });
+                                }
+                              },
+                            )),
+                        Container(
+                            padding: EdgeInsets.zero,
+                            child: new DropdownButton<int>(
+                              hint: Text("Selecciona un valor"),
+                              items: warehouseAreas
+                                  .map((description, value) {
+                                    return MapEntry(
+                                        description,
+                                        DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(description),
+                                        ));
+                                  })
+                                  .values
+                                  .toList(),
+                              value: _defaultWarehouseAreas,
+                              onChanged: (int newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    print(newValue);
+                                    _defaultWarehouseAreas = newValue;
+                                  });
+                                }
+                              },
+                            )),
+                        Container(
+                            padding: EdgeInsets.zero,
+                            child: new DropdownButton<int>(
+                              hint: Text("Selecciona un valor"),
+                              items: warehouseAreasStreets
+                                  .map((description, value) {
+                                    return MapEntry(
+                                        description,
+                                        DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(description),
+                                        ));
+                                  })
+                                  .values
+                                  .toList(),
+                              value: _defaultWarehouseAreasStreets,
+                              onChanged: (int newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    print(newValue);
+                                    _defaultWarehouseAreasStreets = newValue;
+                                  });
+                                }
+                              },
+                            )),
+                        Container(
+                            padding: EdgeInsets.zero,
+                            child: new DropdownButton<int>(
+                              hint: Text("Selecciona un valor"),
+                              items: warehouseAreasSide
+                                  .map((description, value) {
+                                    return MapEntry(
+                                        description,
+                                        DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(description),
+                                        ));
+                                  })
+                                  .values
+                                  .toList(),
+                              value: _defaultWarehouseAreasStreetsSide,
+                              onChanged: (int newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    print(newValue);
+                                    _defaultWarehouseAreasStreetsSide =
+                                        newValue;
+                                  });
+                                }
+                              },
+                            )),
+                        Container(
+                            padding: EdgeInsets.zero,
+                            child: new DropdownButton<int>(
+                              hint: Text("Selecciona un valor"),
+                              items: warehouseAreasLocation
+                                  .map((description, value) {
+                                    return MapEntry(
+                                        description,
+                                        DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(description),
+                                        ));
+                                  })
+                                  .values
+                                  .toList(),
+                              value: _defaultWarehouseAreasLocation,
+                              onChanged: (int newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    print(newValue);
+                                    _defaultWarehouseAreasLocation = newValue;
+                                  });
+                                }
+                              },
+                            ))
+                      ],
                     ),
-                    Divider(
-                      color: Colors.grey.shade900,
-                    )
-                  ],
-                )
-            ],
-            onReorder: (int oldIndex, int newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final int item = _items.removeAt(oldIndex);
-                final Detail det = _itemsOrderDetail.removeAt(oldIndex);
-                _items.insert(newIndex, item);
-                _itemsOrderDetail.insert(newIndex, det);
-              });
-            },
-          ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              Container(
-                  //TODO: crear dropdown bodega - zona - calle - ubicacion
                   )
+                ]),
+              ),
+              Divider(
+                color: Colors.grey.shade900,
+              )
             ],
-          ),
-        )
-      ],
-    );
+          )
+      ]))
+    ]);
   }
 
   void _checkList() {
