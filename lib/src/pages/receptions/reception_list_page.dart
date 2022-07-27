@@ -124,50 +124,44 @@ class _ReceptionOrderState extends State<ReceptionOrderList> {
           child: ReorderableListView(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             children: <Widget>[
-              for (int index = 0; index < _items.length; index++)
+              for (int index = 0; index < _itemsDetail.length; index++)
                 //_generateItemList(_itemsDetail[index], index)
                 Column(
                   key: Key('$index'),
                   children: [
                     ListTile(
-                      minVerticalPadding: 10,
-                      tileColor: _items[index].isOdd
-                          ? oddItemColorDetail
-                          : evenItemColorDetail,
-                      title: Text('${_itemsDetail[index].nmbItem}'),
-                      subtitle: Row(
-                        children: [
-                          Text(
-                            'Cant.: ',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                        key: ObjectKey(_itemsDetail[index]),
+                        minVerticalPadding: 5,
+                        tileColor: _items[index].isOdd
+                            ? oddItemColorDetail
+                            : evenItemColorDetail,
+                        title: Text(
+                          "${_itemsDetail[index].nmbItem} / ${_itemsDetail[index].dscItem}\n\n Precio : ${"\$ " + _itemsDetail[index].prcItem}",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        subtitle: Container(
+                            child: Row(children: [
+                          Text('Cant. ${_itemsDetail[index].unmdItem}: ',
+                              style: TextStyle(fontSize: 14)),
                           Expanded(
-                            child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              initialValue:
-                                  double.parse(_itemsDetail[index].qtyItem)
-                                      .toString(),
-                              style: TextStyle(fontSize: 14.0),
-                              //readOnly: true,
-                              textAlign: TextAlign.center,
-                              validator: (value) {
-                                if (value.isEmpty || double.parse(value) < 1) {
-                                  return 'Cantidad Invalida';
-                                }
-                                return null;
-                              },
-                              onSaved: (String value) {
-                                print(value);
-                              },
-                            ),
-                          ),
-                          Text(
-                            ' ${_itemsDetail[index].unmdItem}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
+                              child: TextFormField(
+                                  // decoration: InputDecoration(
+                                  //     labelText:
+                                  //         _itemsDetail[index].unmdItem),
+                                  keyboardType: TextInputType.number,
+                                  initialValue:
+                                      double.parse(_itemsDetail[index].qtyItem)
+                                          .toString(),
+                                  style: TextStyle(fontSize: 14.0),
+                                  //readOnly: true,
+                                  textAlign: TextAlign.start,
+                                  onChanged: (String value) {
+                                    setState(() {
+                                      _itemsDetail[index].qtyItem = value;
+                                    });
+                                  }))
+                        ]))),
                     Divider(
                       color: Colors.grey.shade900,
                     )
@@ -179,77 +173,62 @@ class _ReceptionOrderState extends State<ReceptionOrderList> {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                final int item = _items.removeAt(oldIndex);
-                final Detail det = _itemsOrderDetail.removeAt(oldIndex);
-                _items.insert(newIndex, item);
-                _itemsOrderDetail.insert(newIndex, det);
+                final item = _itemsDetail.removeAt(oldIndex);
+                //final i = _items.removeAt(oldIndex);
+                _itemsDetail.insert(newIndex, item);
+                //_items.insert(newIndex, i);
               });
             },
           ),
         ),
         Expanded(
-            child: ReorderableListView(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          children: <Widget>[
-            for (int index = 0; index < _itemsOrder.length; index++)
-              //_generateOrderDetailList(_itemsOrderDetail[index], index)
-              Column(
-                key: Key('$index'),
-                children: [
-                  ListTile(
-                      minVerticalPadding: 10,
-                      tileColor: _itemsOrder[index].isOdd
-                          ? oddItemColor
-                          : evenItemColor,
-                      title: Text(
-                          '${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].glosa : ''}'),
-                      subtitle: Row(
-                        children: [
-                          Text(
-                            'Cant.: ',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Expanded(
-                            child: Text((_itemsOrderDetail.length > 0)
-                                ? double.parse(
-                                        _itemsOrderDetail[index].cantidad)
-                                    .toStringAsFixed(1)
-                                : ''),
-                          ),
-                          Text(
-                            ' ${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].unidadIngreso : ''}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      )
-                      /*leading: Icon(
+            child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                children: <Widget>[
+              for (int index = 0; index < _itemsOrder.length; index++)
+                //_generateOrderDetailList(_itemsOrderDetail[index], index)
+                Column(
+                  key: Key('$index'),
+                  children: [
+                    ListTile(
+                        minVerticalPadding: 10,
+                        tileColor: _itemsOrder[index].isOdd
+                            ? oddItemColor
+                            : evenItemColor,
+                        title: Text(
+                            '${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].glosa : ''}',
+                            style: TextStyle(fontSize: 14)),
+                        subtitle: Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Cant.: ',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Expanded(
+                                  child: Text((_itemsOrderDetail.length > 0)
+                                      ? double.parse(
+                                              _itemsOrderDetail[index].cantidad)
+                                          .toStringAsFixed(1)
+                                      : ''),
+                                ),
+                                Text(
+                                  ' ${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].unidadIngreso : ''}',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ))
+                        /*leading: Icon(
                           Icons.chevron_left_sharp
                         ),*/
-                      ),
-                  Divider(
-                    color: Colors.red.shade900,
-                  )
-                ],
-              )
-          ],
-          onReorder: (int oldIndex, int newIndex) {
-            setState(() {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
-              final int item = _itemsOrder.removeAt(oldIndex);
-              print(item);
-
-              final Detail det = _itemsOrderDetail.removeAt(oldIndex);
-
-              _itemsOrder.insert(newIndex, item);
-              _itemsOrderDetail.insert(newIndex, det);
-
-              oddItemColorDetail = Colors.green[800].withOpacity(0.05);
-              evenItemColorDetail = Colors.green[400].withOpacity(0.15);
-            });
-          },
-        )),
+                        ),
+                    Divider(
+                      color: Colors.red.shade900,
+                    )
+                  ],
+                )
+            ])),
       ],
     );
   }
