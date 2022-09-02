@@ -5,18 +5,20 @@ import 'package:async_button_builder/async_button_builder.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
 import 'package:eagon_bodega/src/models/reception_response.dart';
+import 'package:eagon_bodega/src/models/warehouse_model.dart';
 import 'package:eagon_bodega/src/pages/allocation/allocation_dte.dart';
 import 'package:eagon_bodega/src/pages/receptions/resume/reception_resumen.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
+import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class AllocationArguments {
-  final String detailPurchase;
-  final String detailReception;
+  final DteModel detailReception;
+  final WareHouseModel warehouseData;
 
-  AllocationArguments(this.detailPurchase, this.detailReception);
+  AllocationArguments(this.detailReception, this.warehouseData);
 }
 
 /// This is the main application widget.
@@ -33,18 +35,30 @@ class AllocationOrderList extends StatefulWidget {
 class _AllocationOrderState extends State<AllocationOrderList> {
   List<int> _items = [];
   List<Item> _itemsDetail = [];
-  //List<int> _itemsOrder = [];
-  List<int> _itemsOrder = List<int>.generate(0, (int index) => index);
-  List<Detail> _itemsOrderDetail = [];
   DteModel _dteData;
+
+  WareHouseModel wareHouseModel;
+  List<WareHouseModel> listWarehouse = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  bool rebuild = false;
 
   @override
   Widget build(BuildContext context) {
-    String _title = 'Asignación Detalles';
-    final dteargs = ModalRoute.of(context).settings.arguments as fullArguments;
+    String _title = 'Asignación Detalle/Ubicación';
+    final dteargs =
+        ModalRoute.of(context).settings.arguments as AllocationArguments;
 
-    _dteData = dteargs.dteModel;
-    _poolListDte(dteargs.dteModel, dteargs.ocModel);
+    _dteData = dteargs.detailReception;
+    wareHouseModel = dteargs.warehouseData;
+    if (_defaultWarehouse.isEmpty) {
+      _poolListDte(_dteData);
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -60,7 +74,7 @@ class _AllocationOrderState extends State<AllocationOrderList> {
             ),
           ],
         ),
-        body: (_itemsDetail.length > 0)
+        body: (listWarehouse.isNotEmpty)
             ? Column(
                 children: [
                   Row(
@@ -75,7 +89,7 @@ class _AllocationOrderState extends State<AllocationOrderList> {
                       )),
                     ],
                   ),
-                  Expanded(child: _createList()),
+                  Expanded(child: _createList(rebuild)),
                 ],
               )
             : Column(
@@ -88,32 +102,39 @@ class _AllocationOrderState extends State<AllocationOrderList> {
                   ]));
   }
 
-  void _poolListDte(DteModel _dte, PurchaseOrderModel _porder) {
-    _itemsDetail = _dte.data.items;
-    _items = List<int>.generate(_itemsDetail.length, (int index) => index);
-
-    if (_porder != null) {
-      _itemsOrderDetail = _porder.data.details;
-      _itemsOrder =
-          List<int>.generate(_itemsOrderDetail.length, (int index) => index);
-    }
-  }
-
-  int _defaultWarehouse = null;
+  List<int> _defaultWarehouse = []; //dejar como listas
   int _defaultWarehouseAreas = null;
   int _defaultWarehouseAreasStreets = null;
   int _defaultWarehouseAreasStreetsSide = null;
   int _defaultWarehouseAreasLocation = null;
 
-  Widget _createList() {
+  void _poolListDte(DteModel _dte) {
+    _itemsDetail = _dte.data.items;
+    _items = List<int>.generate(_itemsDetail.length, (int index) => index);
+
+    for (var item in _dte.data.items) {
+      listWarehouse.add(wareHouseModel);
+    }
+  }
+
+  Widget _createList(bool rebuild) {
     Color oddItemColorDetail = Colors.orange[200];
     Color evenItemColorDetail = Colors.grey[200];
 
-    const Map<String, int> warehouse = {
-      "AGENTAL": 1,
-      "TRACONTAL": 2,
-      "BODEGA DE PRUEBA": 9
-    };
+    //_defaultWarehouse.clear();
+    Map<String, int> warehouse = {};
+
+    for (var item in listWarehouse) {
+      if (item != null) {
+        for (var det in item.data) {
+          warehouse[det.nombre] = int.parse(det.idBodega);
+        }
+
+        if (!rebuild) {
+          _defaultWarehouse.add(int.parse(item.data.elementAt(0).idBodega));
+        }
+      }
+    }
 
     const Map<String, int> warehouseAreas = {
       "ZONA A": 1,
@@ -192,22 +213,24 @@ class _AllocationOrderState extends State<AllocationOrderList> {
                             child: new DropdownButton<int>(
                               hint: Text("Selecciona un valor"),
                               items: warehouse
-                                  .map((description, value) {
+                                  .map((model, value) {
                                     return MapEntry(
-                                        description,
+                                        model,
                                         DropdownMenuItem<int>(
                                           value: value,
-                                          child: Text(description),
+                                          child: Text(model),
                                         ));
                                   })
                                   .values
                                   .toList(),
-                              value: _defaultWarehouse,
+                              value: _defaultWarehouse[index],
                               onChanged: (int newValue) {
                                 if (newValue != null) {
                                   setState(() {
-                                    print(newValue);
-                                    _defaultWarehouse = newValue;
+                                    _defaultWarehouse[index] = newValue;
+                                    print(_defaultWarehouse[index]);
+                                    this.rebuild = true;
+                                    //TODO: call api
                                   });
                                 }
                               },
@@ -347,7 +370,6 @@ class _AllocationOrderState extends State<AllocationOrderList> {
     });
 
     List<dynamic> detailDte = List<dynamic>();
-    var ocDet = _itemsOrderDetail.asMap();
     var inxDet = 0;
     _itemsDetail.forEach((element) {
       var det = {
@@ -355,8 +377,6 @@ class _AllocationOrderState extends State<AllocationOrderList> {
         'glosa_proveedor': element.nmbItem,
         'cantidad': element.qtyItem, //TODO: cantidad ingresada
         'linea': element.nroLinDet,
-        'oc_codigo': ocDet[inxDet].codigoProducto,
-        'oc_glosa': ocDet[inxDet].glosa
       };
       detailDte.add(det);
       inxDet++;
@@ -365,6 +385,13 @@ class _AllocationOrderState extends State<AllocationOrderList> {
     saveData.addAll({'detail': detailDte});
     //saveData.addAll({'order': _itemsOrderDetail});
     _showMyDialogManual(context, jsonEncode(saveData));
+  }
+
+  Future<WareHouseModel> _getWarehouseList() async {
+    WareHouseProvider warehouseProvider = new WareHouseProvider();
+    WareHouseModel warehouseModel = await warehouseProvider.getWareHouseList();
+
+    return warehouseModel;
   }
 
   Future<void> _showMyDialogManual(

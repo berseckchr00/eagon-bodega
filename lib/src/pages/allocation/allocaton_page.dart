@@ -374,7 +374,7 @@ class FunkyOverlayStateManual extends State<FunkyOverlayManual>
                 },
               )),
           TextFormField(
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.number,
             style: TextStyle(color: Colors.black, fontSize: 16.0),
             controller: _rut,
             decoration: const InputDecoration(

@@ -3,7 +3,10 @@ import 'package:eagon_bodega/src/models/dte_model.dart';
 import 'package:eagon_bodega/src/models/dte_model.dart' as modelDte;
 import 'package:eagon_bodega/src/models/purchase_order_model.dart' as order;
 import 'package:eagon_bodega/src/models/purchase_order_model.dart';
+import 'package:eagon_bodega/src/models/warehouse_model.dart';
+import 'package:eagon_bodega/src/pages/allocation/allocation_list_page.dart';
 import 'package:eagon_bodega/src/providers/reception_provider.dart';
+import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -83,6 +86,8 @@ class _AllocationDtePageState extends State<AllocationDtePage> {
     this._folio = args.dteModel.data.head.dteFolio;
     this._rut = args.dteModel.data.head.rutEmisor;
 
+    WareHouseModel wareHouseModel;
+
     return new Scaffold(
       appBar: AppBar(
         title: Text('Recepción'),
@@ -108,22 +113,29 @@ class _AllocationDtePageState extends State<AllocationDtePage> {
                   onPressed: (!complete)
                       ? onStepContinue
                       : () {
-                          if (ocData == null) {
-                            Fluttertoast.showToast(
-                                msg: "Orden de Compra vacía",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.red,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
+                          _getWarehouseList().then((value) => setState(() {
+                                wareHouseModel = value;
+                                if (ocData == null) {
+                                  Fluttertoast.showToast(
+                                      msg: "Orden de Compra vacía",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
 
-                            Navigator.pushNamed(context, '/allocation_list',
-                                arguments: fullArguments(_dteModel, ocData));
-                          } else {
-                            Navigator.pushNamed(context, '/allocation_list',
-                                arguments: fullArguments(_dteModel, ocData));
-                          }
+                                  Navigator.pushNamed(
+                                      context, '/allocation_list',
+                                      arguments: AllocationArguments(
+                                          _dteModel, wareHouseModel));
+                                } else {
+                                  Navigator.pushNamed(
+                                      context, '/allocation_list',
+                                      arguments: AllocationArguments(
+                                          _dteModel, wareHouseModel));
+                                }
+                              }));
                         },
                   child: Text('Siguiente'),
                 ),
@@ -227,56 +239,12 @@ class _AllocationDtePageState extends State<AllocationDtePage> {
     return stepper;
   }
 
-  // Widget _buildTable() {
-  //   return Expanded(
-  //       flex: 1,
-  //       child: ListView.builder(
-  //         itemCount: lstOrderPurchase.length,
-  //         itemBuilder: (BuildContext ctx, index) {
-  //           // Display the list item
-  //           return Dismissible(
-  //             key: UniqueKey(),
+  Future<WareHouseModel> _getWarehouseList() async {
+    WareHouseProvider warehouseProvider = new WareHouseProvider();
+    WareHouseModel warehouseModel = await warehouseProvider.getWareHouseList();
 
-  //             // only allows the user swipe from right to left
-  //             direction: DismissDirection.endToStart,
-
-  //             // Remove this product from the list
-  //             // In production enviroment, you may want to send some request to delete it on server side
-  //             onDismissed: (_) {
-  //               setState(() {
-  //                 lstOrderPurchase.removeAt(index);
-  //               });
-  //             },
-
-  //             // Display item's title, price...
-  //             child: Card(
-  //               //margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 0),
-  //               child: ListTile(
-  //                 leading: CircleAvatar(
-  //                   child: Text(lstOrderPurchase[index].numero.toString()),
-  //                 ),
-  //                 title: Text(lstOrderPurchase[index].fecha),
-  //                 subtitle: Text(
-  //                     "\$${lstOrderPurchase[index].porcentajeAsignado.toString()}"),
-  //                 trailing: const Icon(Icons.arrow_back),
-  //               ),
-  //             ),
-
-  //             // This will show up when the user performs dismissal action
-  //             // It is a red background and a trash icon
-  //             background: Container(
-  //               color: Colors.red,
-  //               margin: const EdgeInsets.symmetric(horizontal: 15),
-  //               alignment: Alignment.centerRight,
-  //               child: const Icon(
-  //                 Icons.delete,
-  //                 color: Colors.black,
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       ));
-  // }
+    return warehouseModel;
+  }
 
   List<Step> _createStepsDummy() {
     List<Step> steps = [

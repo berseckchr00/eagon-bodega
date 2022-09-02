@@ -151,8 +151,7 @@ class _ReceptionOrderState extends State<ReceptionOrderList> {
                                   //         _itemsDetail[index].unmdItem),
                                   keyboardType: TextInputType.number,
                                   initialValue:
-                                      double.parse(_itemsDetail[index].qtyItem)
-                                          .toString(),
+                                      _itemsDetail[index].qtyItem.toString(),
                                   style: TextStyle(fontSize: 14.0),
                                   //readOnly: true,
                                   textAlign: TextAlign.start,
@@ -182,53 +181,77 @@ class _ReceptionOrderState extends State<ReceptionOrderList> {
           ),
         ),
         Expanded(
-            child: ListView(
+            child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                children: <Widget>[
-              for (int index = 0; index < _itemsOrder.length; index++)
-                //_generateOrderDetailList(_itemsOrderDetail[index], index)
-                Column(
-                  key: Key('$index'),
-                  children: [
-                    ListTile(
-                        minVerticalPadding: 10,
-                        tileColor: _itemsOrder[index].isOdd
-                            ? oddItemColor
-                            : evenItemColor,
-                        title: Text(
-                            '${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].glosa : ''}',
-                            style: TextStyle(fontSize: 14)),
-                        subtitle: Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Cant.: ',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Expanded(
-                                  child: Text((_itemsOrderDetail.length > 0)
-                                      ? double.parse(
-                                              _itemsOrderDetail[index].cantidad)
-                                          .toStringAsFixed(1)
-                                      : ''),
-                                ),
-                                Text(
-                                  ' ${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].unidadIngreso : ''}',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            ))
-                        /*leading: Icon(
-                          Icons.chevron_left_sharp
-                        ),*/
-                        ),
-                    Divider(
-                      color: Colors.red.shade900,
-                    )
-                  ],
-                )
-            ])),
+                itemCount: _itemsOrderDetail.length,
+                itemBuilder: (context, index) {
+                  final item = _itemsOrderDetail[index];
+                  final itemName = _itemsOrderDetail[index].glosa;
+                  return Dismissible(
+                      // Specify the direction to swipe and delete
+                      direction: DismissDirection.startToEnd,
+                      key: UniqueKey(),
+                      onDismissed: (direction) {
+                        // Removes that item the list on swipwe
+                        setState(() {
+                          _itemsOrderDetail.removeAt(index);
+                        });
+                        // Shows the information on Snackbar
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("$itemName eliminado")));
+                      },
+                      background: Container(color: Colors.red.shade300),
+                      child: Column(key: Key('$index'), children: [
+                        ListTile(
+                            minVerticalPadding: 10,
+                            tileColor: _itemsOrder[index].isOdd
+                                ? oddItemColor
+                                : evenItemColor,
+                            title: Text(
+                                "${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].glosa : ''}\n\nPrecio: \$ ${(_itemsOrderDetail[index].precio != null) ? _itemsOrderDetail[index].precio : '0'}",
+                                style: TextStyle(fontSize: 14)),
+                            subtitle: Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: Column(
+                                  children: [
+                                    Row(children: [
+                                      Flexible(
+                                        child: new Text(
+                                          "${_itemsOrderDetail[index].comentario}\n",
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12.0,
+                                          ),
+                                          overflow: TextOverflow.clip,
+                                        ),
+                                      )
+                                    ]),
+                                    Row(children: [
+                                      Text(
+                                        'Cant.: ',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                            (_itemsOrderDetail.length > 0)
+                                                ? double.parse(
+                                                        _itemsOrderDetail[index]
+                                                            .cantidad)
+                                                    .toStringAsFixed(1)
+                                                : ''),
+                                      ),
+                                      Text(
+                                        ' ${(_itemsOrderDetail.length > 0) ? _itemsOrderDetail[index].unidadIngreso : ''}',
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ]),
+                                  ],
+                                ))),
+                        Divider(
+                          color: Colors.red.shade900,
+                        )
+                      ]));
+                }))
       ],
     );
   }
