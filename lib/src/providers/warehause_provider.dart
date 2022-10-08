@@ -28,6 +28,7 @@ class WareHouseProvider {
       //List<Dte> lstDte = new
 
     } catch (ex) {
+      print(ex);
       return null;
     }
   }

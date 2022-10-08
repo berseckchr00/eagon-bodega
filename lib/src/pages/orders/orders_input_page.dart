@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:eagon_bodega/src/forms/orders_input_form.dart';
 import 'package:eagon_bodega/src/models/ccosto_model.dart';
 import 'package:eagon_bodega/src/models/employee_model.dart';
@@ -11,7 +9,6 @@ import 'package:eagon_bodega/src/providers/warehause_provider.dart';
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:json_to_form/json_schema.dart';
 
 class OrdersInput extends StatefulWidget {
   OrdersInput({Key key}) : super(key: key);
@@ -21,11 +18,11 @@ class OrdersInput extends StatefulWidget {
 }
 
 class _OrdersInputState extends State<OrdersInput> {
-
   OrderInputForm orderInputField = new OrderInputForm();
   WareHouseProvider wareHouseProvider = new WareHouseProvider();
-  OutgoingProvider outgoingProvider = new OutgoingProvider(); 
-  List<warehouse.Data> itemsWareHouse = new List<warehouse.Data>();
+  OutgoingProvider outgoingProvider = new OutgoingProvider();
+  List<warehouse.DataWareHouse> itemsWareHouse =
+      new List<warehouse.DataWareHouse>();
   List<EmployeeModel> employeeList = new List<EmployeeModel>();
   List<CCostoModel> ccostList = new List<CCostoModel>();
   List<MachineModel> machineList = new List<MachineModel>();
@@ -41,24 +38,22 @@ class _OrdersInputState extends State<OrdersInput> {
   @override
   void initState() {
     ///setState(() {
-      //_toggleSubmitState();
-      super.initState();
-      getWareHouseList().then((value) => {
-        setState(() {
-          itemsWareHouse = value;
-        })
-      });
-      getEmployeeList().then((value) => {
-        setState(() {
-          employeeList = value;
-        })
-      });
+    //_toggleSubmitState();
+    super.initState();
+    getWareHouseList().then((value) => {
+          setState(() {
+            itemsWareHouse = value;
+          })
+        });
+    getEmployeeList().then((value) => {
+          setState(() {
+            employeeList = value;
+          })
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    
     String form = orderInputField.fields;
     Map decorations = orderInputField.decorations;
 
@@ -68,73 +63,76 @@ class _OrdersInputState extends State<OrdersInput> {
         // the App.build method, and use it to set our appbar title.
         title: new Text("Generación de Pedido"),
       ),
-      body: (itemsWareHouse.isEmpty)? const Center(child: const CircularProgressIndicator()):
-        new SingleChildScrollView(
-        child: new Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          child: new Column(children: <Widget>[
-            new Container(
-              child: new Text(
-                "Datos Generales",
-                style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
-              ),
-              margin: EdgeInsets.only(top: 10.0),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _loadComponent('warehause')
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _loadComponent('employee')
-            ),
-            /* Padding(
+      body: (itemsWareHouse.isEmpty)
+          ? const Center(child: const CircularProgressIndicator())
+          : new SingleChildScrollView(
+              child: new Center(
+                // Center is a layout widget. It takes a single child and positions it
+                // in the middle of the parent.
+                child: new Column(children: <Widget>[
+                  new Container(
+                    child: new Text(
+                      "Datos Generales",
+                      style: TextStyle(
+                          fontSize: 30.0, fontWeight: FontWeight.bold),
+                    ),
+                    margin: EdgeInsets.only(top: 10.0),
+                  ),
+                  Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: _loadComponent('warehause')),
+                  Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: _loadComponent('employee')),
+                  /* Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: _loadComponent('machine')
             ), */
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _loadComponent('ccost')
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: _loadComponent('itemcost')
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                //primary: Colors.orange
+                  Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: _loadComponent('ccost')),
+                  Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: _loadComponent('itemcost')),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          //primary: Colors.orange
+                          ),
+                      onPressed: () {
+                        itemForm.remove('ID_MAQUINA');
+                        itemForm.addAll({'ID_MAQUINA': 0});
+                        if (!_validateForm()) {
+                          Fluttertoast.showToast(
+                              msg: "Faltan elementos por cargar",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        } else {
+                          Navigator.pushNamed(context, "/orders_input_detail",
+                              arguments: itemForm);
+                        }
+                      },
+                      child: Text(
+                        'Ingresar Detalle',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      )),
+                ]),
               ),
-              onPressed: (){
-                itemForm.remove('ID_MAQUINA');
-                itemForm.addAll({'ID_MAQUINA': 0});
-                if(!_validateForm()){
-                  Fluttertoast.showToast(
-                    msg: "Faltan elementos por cargar",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                  );
-                }else{
-                  Navigator.pushNamed(context, "/orders_input_detail", arguments: itemForm);
-                }
-              },
-              child: Text('Ingresar Detalle',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  )
-              ),
-          ]),
-        ),
-      ),
+            ),
     );
   }
 
-  Future<List<warehouse.Data>> getWareHouseList() async {    
-    warehouse.WareHouseModel wareHouse = await wareHouseProvider.getWareHouseList();
-    
+  Future<List<warehouse.DataWareHouse>> getWareHouseList() async {
+    warehouse.WareHouseModel wareHouse =
+        await wareHouseProvider.getWareHouseList();
+
     /* List<String> items = new List<String>();
     wareHouse.data.forEach((element) {
       items.add(element.nombre);
@@ -142,83 +140,75 @@ class _OrdersInputState extends State<OrdersInput> {
     return wareHouse.data;
   }
 
-  Future<List<EmployeeModel>> getEmployeeList() async{
+  Future<List<EmployeeModel>> getEmployeeList() async {
     return await outgoingProvider.getEmployeeList();
     //print(employeeList.toString());
   }
 
-  Future<List<CCostoModel>> getCCostList(idDepartment) async{
+  Future<List<CCostoModel>> getCCostList(idDepartment) async {
     return await outgoingProvider.getCCostList(idDepartment);
     //print(employeeList.toString());
   }
 
-  Future<List<MachineModel>> getMachineList(idDepartment) async{
+  Future<List<MachineModel>> getMachineList(idDepartment) async {
     return await outgoingProvider.getMachineList(idDepartment);
     //print(employeeList.toString());
   }
 
-  Future<List<ItemCostModel>> getItemCostList(idDepartment) async{
+  Future<List<ItemCostModel>> getItemCostList(idDepartment) async {
     return await outgoingProvider.getItemCostList(idDepartment);
     //print(employeeList.toString());
   }
 
-  Widget createDropdownWareHouse(){
-    return  FindDropdown<warehouse.Data>(
+  Widget createDropdownWareHouse() {
+    return FindDropdown<warehouse.DataWareHouse>(
       items: itemsWareHouse,
       label: "Bodega",
       searchBoxDecoration: InputDecoration(
-        labelText: "Bodega",
-        prefixIcon: Icon(Icons.info_outline),
-        border: OutlineInputBorder()
-      ),
+          labelText: "Bodega",
+          prefixIcon: Icon(Icons.info_outline),
+          border: OutlineInputBorder()),
       autofocus: true,
       showSearchBox: true,
-      labelStyle: TextStyle(
-        color: Colors.red
-      ),
+      labelStyle: TextStyle(color: Colors.red),
       searchHint: "Selecciona una Bodega",
-      onChanged: (warehouse.Data item) {
+      onChanged: (warehouse.DataWareHouse item) {
         itemForm.remove('ID_BODEGA');
-        var it = {'ID_BODEGA':item.idBodega};
+        var it = {'ID_BODEGA': item.idBodega};
         itemForm.addAll(it);
       },
-      validate: (warehouse.Data item) {
-        if (item == null){
-           
-            Fluttertoast.showToast(
+      validate: (warehouse.DataWareHouse item) {
+        if (item == null) {
+          Fluttertoast.showToast(
               msg: "No se pudo cargar listado de bodegas",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
               backgroundColor: Colors.red,
               textColor: Colors.white,
-              fontSize: 16.0
-            );
-             return null;
-        }else
+              fontSize: 16.0);
+          return null;
+        } else
           return null; //return null to "no error"
       },
     );
   }
 
-  Widget createDropdownEmploye(){
-    return  FindDropdown<EmployeeModel>(
+  Widget createDropdownEmploye() {
+    return FindDropdown<EmployeeModel>(
       items: employeeList,
       label: "Empleado",
       searchBoxDecoration: InputDecoration(
-        labelText: "Empleado",
-        prefixIcon: Icon(Icons.info_outline),
-        border: OutlineInputBorder()
-      ),
+          labelText: "Empleado",
+          prefixIcon: Icon(Icons.info_outline),
+          border: OutlineInputBorder()),
       autofocus: true,
       showSearchBox: true,
-      labelStyle: TextStyle(
-        color: Colors.red
-      ),
+      labelStyle: TextStyle(color: Colors.red),
       searchHint: "Selecciona un empleado",
       onChanged: (EmployeeModel item) => {
         itemForm.remove('ID_EMPLEADO'),
-        itemForm.addAll({'ID_EMPLEADO':item.idPersonal}),
+        itemForm.addAll({'ID_EMPLEADO': item.idPersonal}),
         print(itemForm),
         getCCostList(item.idDepartment).then((value) {
           setState(() {
@@ -247,24 +237,21 @@ class _OrdersInputState extends State<OrdersInput> {
     );
   }
 
-  Widget createDropdownCCost(){
-    return  FindDropdown<CCostoModel>(
+  Widget createDropdownCCost() {
+    return FindDropdown<CCostoModel>(
       items: ccostList,
       label: "Centro de Costo",
       searchBoxDecoration: InputDecoration(
-        labelText: "Centro de Costo",
-        prefixIcon: Icon(Icons.info_outline),
-        border: OutlineInputBorder()
-      ),
+          labelText: "Centro de Costo",
+          prefixIcon: Icon(Icons.info_outline),
+          border: OutlineInputBorder()),
       autofocus: true,
       showSearchBox: true,
-      labelStyle: TextStyle(
-        color: Colors.red
-      ),
+      labelStyle: TextStyle(color: Colors.red),
       searchHint: "Selecciona un centro de costo",
       onChanged: (CCostoModel item) {
         itemForm.remove('ID_CENTRO_COSTO');
-        itemForm.addAll({'ID_CENTRO_COSTO':item.cCostoCode});
+        itemForm.addAll({'ID_CENTRO_COSTO': item.cCostoCode});
       },
       //selectedItem: "Busqueda de empleado",
       validate: (CCostoModel item) {
@@ -276,63 +263,55 @@ class _OrdersInputState extends State<OrdersInput> {
     );
   }
 
-  Widget createDropdownItemCost(){
-    return  FindDropdown<ItemCostModel>(
+  Widget createDropdownItemCost() {
+    return FindDropdown<ItemCostModel>(
       items: itemCostList,
       label: "Item Gasto",
       searchBoxDecoration: InputDecoration(
-        labelText: "Item Gasto",
-        prefixIcon: Icon(Icons.info_outline),
-        border: OutlineInputBorder()
-      ),
+          labelText: "Item Gasto",
+          prefixIcon: Icon(Icons.info_outline),
+          border: OutlineInputBorder()),
       autofocus: true,
       showSearchBox: true,
-      labelStyle: TextStyle(
-        color: Colors.red
-      ),
+      labelStyle: TextStyle(color: Colors.red),
       searchHint: "Selecciona un Item de Gasto",
-      onChanged: (ItemCostModel item) {        
+      onChanged: (ItemCostModel item) {
         itemForm.remove('ID_ITEM_GASTO');
-        itemForm.addAll({'ID_ITEM_GASTO':item.code});
+        itemForm.addAll({'ID_ITEM_GASTO': item.code});
       },
       //selectedItem: "Busqueda de empleado",
       validate: (ItemCostModel item) {
-        if (item == null){
-           
-            Fluttertoast.showToast(
+        if (item == null) {
+          Fluttertoast.showToast(
               msg: "No se pudo cargar listado de bodegas",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
               backgroundColor: Colors.red,
               textColor: Colors.white,
-              fontSize: 16.0
-            );
-             return null;
-        }else
-          return null;  //return null to "no error"
+              fontSize: 16.0);
+          return null;
+        } else
+          return null; //return null to "no error"
       },
     );
   }
 
-  Widget createDropdownMachine(){
-    return  FindDropdown<MachineModel>(
+  Widget createDropdownMachine() {
+    return FindDropdown<MachineModel>(
       items: machineList,
       label: "Maquina",
       searchBoxDecoration: InputDecoration(
-        labelText: "Maquina",
-        prefixIcon: Icon(Icons.info_outline),
-        border: OutlineInputBorder()
-      ),
+          labelText: "Maquina",
+          prefixIcon: Icon(Icons.info_outline),
+          border: OutlineInputBorder()),
       autofocus: true,
       showSearchBox: true,
-      labelStyle: TextStyle(
-        color: Colors.red
-      ),
+      labelStyle: TextStyle(color: Colors.red),
       searchHint: "Selecciona una Maquina",
       onChanged: (MachineModel item) {
         itemForm.remove('ID_MAQUINA');
-        itemForm.addAll({'ID_MAQUINA':item.idMachine});
+        itemForm.addAll({'ID_MAQUINA': item.idMachine});
       },
       //selectedItem: "Busqueda de empleado",
       validate: (MachineModel item) {
@@ -345,64 +324,69 @@ class _OrdersInputState extends State<OrdersInput> {
   }
 
   _loadComponent(String s) {
-    
     switch (s) {
       case 'warehause':
         {
-          if (itemsWareHouse != null){
-            return (itemsWareHouse.isNotEmpty)?createDropdownWareHouse(): Container()
-                /* const Center(child: const CircularProgressIndicator()) */;
+          if (itemsWareHouse != null) {
+            return (itemsWareHouse.isNotEmpty)
+                ? createDropdownWareHouse()
+                : Container() /* const Center(child: const CircularProgressIndicator()) */;
           }
-        break;
+          break;
         }
       case 'employee':
-      {
-        if (employeeList != null){
-          return (employeeList.isNotEmpty)?createDropdownEmploye(): Container()
-                /* const Center(child: const CircularProgressIndicator() )*/;
+        {
+          if (employeeList != null) {
+            return (employeeList.isNotEmpty)
+                ? createDropdownEmploye()
+                : Container() /* const Center(child: const CircularProgressIndicator() )*/;
+          }
+          break;
         }
-        break;
-      } 
-      case 'machine':{
-        if (machineList != null){
-           return (machineList.isNotEmpty)? createDropdownMachine(): Container()
-                /* const Center(child: const CircularProgressIndicator()) */;
+      case 'machine':
+        {
+          if (machineList != null) {
+            return (machineList.isNotEmpty)
+                ? createDropdownMachine()
+                : Container() /* const Center(child: const CircularProgressIndicator()) */;
+          }
+          break;
         }
-        break;
-      }
-      case 'ccost':{
-        if (ccostList != null){
-          return (ccostList.isNotEmpty)?createDropdownCCost(): Container() 
-                /* const Center(child: const CircularProgressIndicator()) */;
+      case 'ccost':
+        {
+          if (ccostList != null) {
+            return (ccostList.isNotEmpty)
+                ? createDropdownCCost()
+                : Container() /* const Center(child: const CircularProgressIndicator()) */;
+          }
+          break;
         }
-        break;
-      }
-      case 'itemcost':{
-        if (itemCostList != null){
-          return (itemCostList.isNotEmpty)? createDropdownItemCost(): Container()
-                /* const Center(child: const CircularProgressIndicator()) */;
+      case 'itemcost':
+        {
+          if (itemCostList != null) {
+            return (itemCostList.isNotEmpty)
+                ? createDropdownItemCost()
+                : Container() /* const Center(child: const CircularProgressIndicator()) */;
+          }
+          break;
         }
-        break;
-      }
-
     }
   }
 
   _validateForm() {
-
-    if (!itemForm.containsKey('ID_BODEGA')){
+    if (!itemForm.containsKey('ID_BODEGA')) {
       return false;
     }
-    if (!itemForm.containsKey('ID_EMPLEADO')){
+    if (!itemForm.containsKey('ID_EMPLEADO')) {
       return false;
     }
     /* if (!itemForm.containsKey('ID_MAQUINA')){
       return false;
     } */
-    if (!itemForm.containsKey('ID_ITEM_GASTO')){
+    if (!itemForm.containsKey('ID_ITEM_GASTO')) {
       return false;
     }
-    if (!itemForm.containsKey('ID_CENTRO_COSTO')){
+    if (!itemForm.containsKey('ID_CENTRO_COSTO')) {
       return false;
     }
 

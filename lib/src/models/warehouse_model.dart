@@ -1,13 +1,13 @@
 class WareHouseModel {
-  List<Data> data;
+  List<DataWareHouse> data;
 
   WareHouseModel({this.data});
 
   WareHouseModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      data = new List<Data>();
+      data = new List<DataWareHouse>();
       json['data'].forEach((v) {
-        data.add(new Data.fromJson(v));
+        data.add(new DataWareHouse.fromJson(v));
       });
     }
   }
@@ -21,7 +21,7 @@ class WareHouseModel {
   }
 }
 
-class Data {
+class DataWareHouse {
   String idBodega;
   String nombre;
   String vigencia;
@@ -30,13 +30,13 @@ class Data {
   String recepcionPuerto;
   String trasladoBodegas;
   String dateCreate;
-  Null ctaCorrienteFlex;
-  Null razonSocialFlex;
+  String ctaCorrienteFlex;
+  String razonSocialFlex;
 
   @override
   String toString() => this.nombre;
-  
-  Data(
+
+  DataWareHouse(
       {this.idBodega,
       this.nombre,
       this.vigencia,
@@ -48,7 +48,7 @@ class Data {
       this.ctaCorrienteFlex,
       this.razonSocialFlex});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  DataWareHouse.fromJson(Map<String, dynamic> json) {
     idBodega = json['ID_BODEGA'];
     nombre = json['NOMBRE'];
     vigencia = json['VIGENCIA'];
